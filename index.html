@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 工具總覽</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #21201e;
+    --surface: #2d2c29;
+    --surface-hover: #35342f;
+    --ink: #e8e6dd;
+    --muted: #9a988e;
+    --accent: #d97757;
+    --accent-soft: #3a3029;
+    --hairline: #3b3a35;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "PingFang TC", "Noto Sans TC", "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    padding-bottom: 6rem;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  header { padding: 56px 0 8px; }
+  .header-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  h1 {
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  .subtitle { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
+  .meta { color: var(--muted); font-size: 0.85rem; text-align: right; }
+  .meta b { color: var(--accent); font-weight: 600; }
+
+  .searchbar { margin: 28px 0 20px; position: relative; }
+  .searchbar input {
+    width: 100%;
+    padding: 12px 18px 12px 44px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .searchbar input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .searchbar svg {
+    position: absolute; left: 16px; top: 50%;
+    transform: translateY(-50%);
+    width: 18px; height: 18px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hairline);
+    margin-bottom: 28px;
+  }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tab {
+    font-family: inherit;
+    font-size: 0.92rem;
+    padding: 8px 16px;
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .tab:hover { border-color: var(--accent); }
+  .tab:active { transform: scale(0.97); }
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #f4f7f4;
+  }
+  .tab .count {
+    font-size: 0.78rem;
+    opacity: 0.65;
+    margin-left: 4px;
+  }
+
+  .search-hint {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .card:hover {
+    background: var(--surface-hover);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--hairline));
+    transform: translateY(-1px);
+  }
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .card h3 { font-size: 1.05rem; font-weight: 650; letter-spacing: -0.01em; }
+  .chip {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 2px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .tabchip {
+    display: none;
+    font-size: 0.72rem;
+    color: var(--muted);
+    border: 1px solid var(--hairline);
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-left: 6px;
+    white-space: nowrap;
+  }
+  .searching .tabchip { display: inline-block; }
+  .card .summary { font-size: 0.92rem; color: var(--ink); margin-bottom: 10px; }
+  .card .usage {
+    font-size: 0.88rem;
+    color: var(--muted);
+    padding-top: 10px;
+    border-top: 1px solid var(--hairline);
+  }
+  .card .usage b { color: var(--accent); font-weight: 600; }
+  .card .note {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 8px;
+    background: var(--accent-soft);
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+  .cmdlist {
+    list-style: none;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hairline);
+  }
+  .cmdlist li {
+    display: flex;
+    gap: 10px;
+    font-size: 0.86rem;
+    padding: 3px 0;
+  }
+  .cmdlist code { flex-shrink: 0; align-self: flex-start; margin-top: 2px; }
+  .cmdlist span { color: var(--muted); }
+  code {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 0.85em;
+    background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
+    padding: 1px 6px;
+    border-radius: 5px;
+  }
+  .empty {
+    display: none;
+    text-align: center;
+    color: var(--muted);
+    padding: 60px 0;
+    font-size: 0.95rem;
+  }
+  footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  @media (max-width: 640px) {
+    header { padding-top: 32px; }
+    .meta { text-align: left; }
+    .grid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="header-row">
+      <div>
+        <h1>Claude Code 工具總覽</h1>
+        <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
+      </div>
+      <p class="meta">最後更新 <b>2026/07/15</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」</p>
+    </div>
+    <div class="searchbar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="search" id="q" placeholder="搜尋工具名稱或關鍵字，例如：爬蟲、隱私、簡報、天氣…">
+    </div>
+  </header>
+
+  <nav><div class="tabs" id="tabs"></div></nav>
+
+  <p class="search-hint" id="hint">搜尋結果涵蓋所有分頁</p>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty">沒有符合的工具，換個關鍵字試試。</p>
+
+  <footer>
+    <p>設定檔位置：全域 skills 在 <code>~/.claude/skills/</code>、自建 slash 指令在 <code>~/.claude/commands/</code>（專案的在各自 <code>.claude/commands/</code>）、權限與 hooks 在 <code>~/.claude/settings.json</code>、自裝 MCP 在 <code>~/.claude.json</code>、終端機捷徑在 <code>~/.zshrc</code>、全域偏好在 <code>~/.claude/CLAUDE.md</code>。</p>
+    <p style="margin-top:8px">內建 slash 指令清單以 <a href="https://code.claude.com/docs/en/commands" style="color:var(--accent)">Claude Code 官方文件</a> 為準，版本更新可能增減。</p>
+  </footer>
+</div>
+
+<script>
+const TABS = ["Skills", "外掛包", "MCP・連接器", "本地 AI・CLI", "終端機捷徑", "CLI 啟動參數", "Slash 指令", "自動化・防護", "as-code 工具"];
+
+const TOOLS = [
+  // ── Skills ──
+  { tab: 0, name: "aiderAssistant", type: "自建 skill",
+    summary: "本地隱私派工流程：由本機 aider 驅動 Ollama Gemma 直接改檔案，資料全程不出電腦。",
+    usage: "<b>怎麼用：</b>跟 Claude 說「這批資料不能上雲」或提到 aider 就會自動接手。Claude 組指令、aider 動手、你親自驗收，Claude 不讀敏感內容。" },
+  { tab: 0, name: "geminiVertex", type: "自建 skill",
+    summary: "用 GCP $300 試用金透過 Vertex AI 呼叫 Gemini 當寫程式幫手：雜活用 2.5-flash、難題用 3.1-pro。",
+    usage: "<b>怎麼用：</b>說「讓 Gemini 幫忙寫／改程式」或想省 Claude token 時自動啟用，走 gcloud ADC 認證。",
+    note: "試用金約 2026/10/11 到期，已設 launchd 提醒。" },
+  { tab: 0, name: "googleMaps", type: "自建 skill",
+    summary: "用自己的 Google Maps API key 查地點、商家、路線、天氣、空氣品質。",
+    usage: "<b>怎麼用：</b>問停車場、找店家、規劃行程動線、查營業時間或當地天氣時自動觸發，不用明講 Google Maps。" },
+  { tab: 0, name: "heptabase-cli（skill 包）", type: "第三方 skill",
+    summary: "Heptabase CLI 的操作知識包（v1.4.1）：放卡上白板、加標籤、搜尋卡片等 MCP 做不到的寫入操作。",
+    usage: "<b>怎麼用：</b>涉及 Heptabase 寫入時自動載入。要先開著 Heptabase 桌面版並跑過 <code>heptabase start</code>。" },
+  { tab: 0, name: "brainstorming", type: "superpowers 精選",
+    summary: "大專案動工前的需求釐清與設計討論流程：一次問一個問題、提 2 到 3 個方案、寫成設計文件再動工。",
+    usage: "<b>怎麼用：</b>開比較大、需求還模糊的專案時自動啟用；小任務會跳過。也可以直接說「用 brainstorming 幫我想」。",
+    note: "已在地化：修掉未安裝的相依 skill、觸發條件改成只對大專案。" },
+  { tab: 0, name: "writing-plans", type: "superpowers 精選",
+    summary: "把確定的規格拆成帶測試步驟的細粒度實作計畫，每步都有明確檔案路徑與驗證方式。",
+    usage: "<b>怎麼用：</b>brainstorming 定案後自動接手，或有現成規格時說「幫我寫實作計畫」。" },
+  { tab: 0, name: "systematic-debugging", type: "superpowers 精選",
+    summary: "修 bug 的紀律：先四階段找根因（讀錯誤、重現、找差異、驗證假設），禁止亂槍打鳥地試修。",
+    usage: "<b>怎麼用：</b>遇到 bug 或測試失敗時自動啟用；連續修三次失敗會停下來檢討架構而不是硬修。" },
+  { tab: 0, name: "design-taste-frontend", type: "設計 skill",
+    summary: "反模板感的網頁設計 skill：做 landing page、作品集網站時避開 AI 千篇一律的套路。",
+    usage: "<b>怎麼用：</b>做形象頁、作品集、官網改版時指名使用，會先宣告設計方向再動手。" },
+  { tab: 0, name: "impeccable", type: "設計 skill",
+    summary: "介面設計全能包：設計、改版、審查、打磨 UI，涵蓋排版、配色、動態、無障礙、文案。",
+    usage: "<b>怎麼用：</b>任何「把介面弄好看、弄好用」的需求都可以指名它，包括嫌設計太平淡或太吵。" },
+  { tab: 0, name: "docx（Word）", type: "文件 skill",
+    summary: "建立、讀取、編輯 Word 文件：目錄、頁碼、信頭、追蹤修訂都能處理。",
+    usage: "<b>怎麼用：</b>提到 .docx 或要產出正式報告、信件時自動啟用。" },
+  { tab: 0, name: "pdf", type: "文件 skill",
+    summary: "PDF 全能處理：抽文字表格、合併分割、旋轉、浮水印、填表單、OCR 掃描檔。",
+    usage: "<b>怎麼用：</b>任何 PDF 相關需求自動啟用，丟檔案路徑給 Claude 就好。" },
+  { tab: 0, name: "pptx（簡報）", type: "文件 skill",
+    summary: "簡報檔處理：做投影片、讀取內容、改現有簡報、處理版型與備忘稿。",
+    usage: "<b>怎麼用：</b>提到「簡報」「slides」或 .pptx 檔案時自動啟用。" },
+  { tab: 0, name: "xlsx（試算表）", type: "文件 skill",
+    summary: "試算表處理：開 xlsx／csv、算公式、做圖表、清理亂糟糟的表格資料。",
+    usage: "<b>怎麼用：</b>丟試算表檔案給 Claude 或說要產出表格檔時自動啟用。" },
+
+  // ── 外掛包 ──
+  { tab: 1, name: "example-skills（Anthropic 官方包）", type: "plugin",
+    summary: "官方 skill 合集，共 12 個：skill-creator（做新 skill）、mcp-builder、frontend-design、algorithmic-art、canvas-design、doc-coauthoring、internal-comms、slack-gif-creator、theme-factory、web-artifacts-builder、webapp-testing、brand-guidelines。",
+    usage: "<b>怎麼用：</b>Claude 依情境自動挑用。最常用到的是 skill-creator：想把某個工作流程固定下來時說「幫我做成 skill」。" },
+  { tab: 1, name: "ui-ux-pro-max", type: "plugin",
+    summary: "第三方 UI/UX 知識庫：配色、字體搭配、無障礙規則、各框架最佳實踐。",
+    usage: "<b>怎麼用：</b>做介面或檢查介面時當參考依據，可以指名「用 ui-ux-pro-max 檢查」。",
+    note: "2026/07 安裝時已檢查過程式碼，但內容當參考就好、不無條件全信。" },
+
+  // ── MCP・連接器 ──
+  { tab: 2, name: "Firecrawl", type: "自裝 MCP",
+    summary: "整站爬取與網頁搜尋，能抓乾淨的文字資料，對社群網站和擋爬蟲的網站特別有用。",
+    usage: "<b>怎麼用：</b>說「爬這個網站」「搜尋某主題」時 Claude 會優先用它。API key 已設定，免費額度有限、大量使用要留意。" },
+  { tab: 2, name: "Playwright", type: "自裝 MCP",
+    summary: "操作瀏覽器：開網頁、點擊、填表單、截圖，適合要「模擬真人操作」或登入後才看得到的頁面。",
+    usage: "<b>怎麼用：</b>說「用瀏覽器打開／操作某網站」即可，不需要 API key。" },
+  { tab: 2, name: "Claude in Chrome", type: "內建連接器",
+    summary: "直接操控你正在用的 Chrome 分頁：讀頁面、點按、錄 GIF、看 console 和網路請求。",
+    usage: "<b>怎麼用：</b>說「看我現在開的分頁」「幫我操作這個網頁」。與 Playwright 的差別：這個用的是你本人登入狀態的瀏覽器。" },
+  { tab: 2, name: "Figma", type: "內建連接器",
+    summary: "讀寫 Figma 設計檔：抓設計稿轉程式碼、把設計推回 Figma、產截圖、抓設計變數。",
+    usage: "<b>怎麼用：</b>貼 figma.com 連結，或說「把這個設計做進 Figma」。" },
+  { tab: 2, name: "Adobe for creativity", type: "內建連接器",
+    summary: "Adobe 生態的影像處理：去背、調色、生成擴圖、字型建議、PDF 與 InDesign 轉檔。",
+    usage: "<b>怎麼用：</b>要修圖、做海報簡報視覺、處理 Adobe 檔案格式時說明需求即可。" },
+  { tab: 2, name: "Gmail", type: "內建連接器",
+    summary: "讀取、搜尋、標記信件，建立草稿（不會直接寄出）。",
+    usage: "<b>怎麼用：</b>說「查某封信」「幫我草擬回信」。GCP 預算警示信也寄到這個信箱，可以請 Claude 查用量。" },
+  { tab: 2, name: "Google Drive", type: "內建連接器",
+    summary: "搜尋、讀取、建立雲端硬碟裡的檔案與文件。",
+    usage: "<b>怎麼用：</b>資料放在 Drive 時直接說檔名或內容關鍵字。" },
+  { tab: 2, name: "Notion", type: "內建連接器",
+    summary: "讀取、建立、更新 Notion 頁面和資料庫，適合結構化、要跟別人共用的資料。",
+    usage: "<b>怎麼用：</b>說「存到 Notion」「查 Notion 某頁」。跟 Heptabase 的分工：Notion 放共用與資料庫化的內容。" },
+  { tab: 2, name: "Heptabase", type: "內建連接器",
+    summary: "讀白板、卡片、標籤、日誌，做語意搜尋，是個人知識庫的查詢入口。",
+    usage: "<b>怎麼用：</b>查詢用 MCP 就好；放卡上白板、加標籤等寫入操作改用 Heptabase CLI。",
+    note: "日誌唯讀、不刪卡，有 hook 機器強制擋著。" },
+
+  // ── 本地 AI・CLI ──
+  { tab: 3, name: "Ollama + Gemma 12B", type: "本地模型",
+    summary: "本機跑的 gemma4:12b-mlx：翻譯、摘要、改寫、格式轉換等簡單大量的文字活，免費且資料不出電腦。",
+    usage: "<b>怎麼用：</b>Claude 會依三層派工原則自動把適合的活丟給它（走 <code>localhost:11434</code> API，簡單活關思考求快）。" },
+  { tab: 3, name: "aider", type: "本地 CLI",
+    summary: "本機的 AI 改檔工具（v0.86.2），串 Ollama Gemma 直接修改檔案，是 aiderAssistant skill 的執行端。",
+    usage: "<b>怎麼用：</b>透過 aiderAssistant skill 由 Claude 代為指揮；或在終端機打 <code>aider</code> 快速指令自己互動。" },
+  { tab: 3, name: "Gemini CLI", type: "外部 AI",
+    summary: "Google 的免費命令列 AI：1M context 讀超長文件無可取代，也能連 Google 搜尋。",
+    usage: "<b>怎麼用：</b>Claude 用 <code>gemini -p</code> 呼叫它當第二代理。每日免費額度有限，優先留給長文件。" },
+  { tab: 3, name: "gcloud / Vertex AI", type: "外部 AI",
+    summary: "Google Cloud SDK（裝在 <code>~/google-cloud-sdk/</code>），用 ADC 認證呼叫 Vertex AI 的 Gemini 模型。",
+    usage: "<b>怎麼用：</b>一般不用直接碰，geminiVertex skill 會處理認證和呼叫細節。" },
+  { tab: 3, name: "Heptabase CLI", type: "本地 CLI",
+    summary: "Heptabase 的命令列工具（<code>/opt/homebrew/bin/heptabase</code>）：放卡上白板、加標籤、建卡、搜尋，補足 MCP 沒有的寫入功能。",
+    usage: "<b>怎麼用：</b>要先開 Heptabase 桌面版並啟用 CLI。說「存到 Heptabase」預設就是走 CLI 建卡放到 Raw Files 白板。" },
+  { tab: 3, name: "trash", type: "安全工具",
+    summary: "把「刪除」改成「丟垃圾桶」的小工具，終端機的 <code>rm</code> 已經全域改指向它。",
+    usage: "<b>怎麼用：</b>平常照打 <code>rm</code> 就是可還原的刪除；真要永久刪除才用 <code>rm!</code>。" },
+
+  // ── 終端機捷徑 ──
+  { tab: 4, name: "cc", type: "終端機指令",
+    summary: "一鍵開工：切到 ClaudeCode 資料夾並啟動 Claude Code，預設開 remote control。",
+    usage: "<b>怎麼用：</b>終端機直接打 <code>cc</code>，就能從手機接管這個 session。" },
+  { tab: 4, name: "cw", type: "終端機指令",
+    summary: "Heptabase Wiki 專用入口：切到 Heptabase_LLM_Wiki 資料夾啟動，session 固定叫 Heptabase_Librarian。",
+    usage: "<b>怎麼用：</b>要做 LLM Wiki 的正式操作（/ingest、/lint）時打 <code>cw</code>，wiki 操作只在這個資料夾執行。" },
+  { tab: 4, name: "claude", type: "終端機指令",
+    summary: "包過的 claude 指令：不管在哪個資料夾打，都先切到 ClaudeCode 資料夾再啟動。",
+    usage: "<b>怎麼用：</b>照常打 <code>claude</code> 即可；要在別的資料夾啟動時用 <code>command claude</code> 繞過。" },
+  { tab: 4, name: "aider（快速指令）", type: "終端機指令",
+    summary: "切到 aider 專用資料夾，並直接以本地 Ollama Gemma 模型啟動 aider 互動模式。",
+    usage: "<b>怎麼用：</b>終端機打 <code>aider</code>，想自己跟本地模型對話改檔時用。" },
+  { tab: 4, name: "rm → 垃圾桶", type: "終端機指令",
+    summary: "<code>rm</code> 已改成丟垃圾桶（可還原）；<code>rm!</code> 才是真正的永久刪除。",
+    usage: "<b>怎麼用：</b>平常照舊打 rm 就安全；刪錯了去垃圾桶撈回來。" },
+  { tab: 4, name: "! 前綴", type: "session 技巧",
+    summary: "在 Claude Code 對話框輸入 <code>! 指令</code>，會直接在這個 session 跑該指令，輸出進到對話裡。",
+    usage: "<b>怎麼用：</b>適合互動式登入（如 <code>! gcloud auth login</code>）這種需要你本人操作的指令。" },
+
+  // ── CLI 啟動參數 ──
+  { tab: 5, name: "接續舊對話", type: "啟動旗標",
+    summary: "在終端機啟動 claude 時加的參數，用來接回之前的對話（跟對話框裡的 /resume 是「進門前選」對「進門後換」的差別）。",
+    commands: [
+      ["claude -c", "載入這個資料夾最近一次對話（--continue 的縮寫）"],
+      ["claude -r \"名稱\"", "按 session ID 或名稱恢復指定的舊對話（--resume）"],
+      ["claude --fork-session", "恢復時開一個新的 session ID，不覆蓋原本那條"],
+    ] },
+  { tab: 5, name: "啟動時設定", type: "啟動旗標",
+    summary: "啟動當下就把模型、名稱、目錄等設好，省得進去再調。",
+    commands: [
+      ["--model <名稱>", "指定用哪個模型啟動（如 --model opus）"],
+      ["--effort <級別>", "設思考努力級別（低／中／高／超高／最高）"],
+      ["--name / -n <名稱>", "給這個 session 取顯示名稱（遠端控制列表好認）"],
+      ["--add-dir <路徑>", "啟動就多掛一個可讀寫的工作目錄"],
+      ["--permission-mode <模式>", "用指定的權限模式啟動"],
+      ["--fallback-model <名稱>", "主模型過載時自動退到指定備援模型"],
+    ] },
+  { tab: 5, name: "連線與裝置", type: "啟動旗標",
+    summary: "啟動時就開好跨裝置、瀏覽器、IDE 或背景執行。",
+    commands: [
+      ["--remote-control / --rc", "啟動就開遠端控制（你的 cc、cw 捷徑就是靠這個）"],
+      ["--teleport", "在本地終端機恢復一個網頁上的 session"],
+      ["--ide", "啟動時自動連上 IDE"],
+      ["--chrome", "開啟 Chrome 瀏覽器整合"],
+      ["--bg / --background", "以背景代理身分啟動、立刻放你回終端機"],
+      ["-w / --worktree", "在隔離的 git worktree 裡啟動"],
+    ] },
+  { tab: 5, name: "claude 子命令", type: "子命令",
+    summary: "接在 claude 後面的動作字（不是旗標），用來做維護或設定，不會進入對話。",
+    commands: [
+      ["claude update", "更新到最新版"],
+      ["claude doctor", "跑安裝與設定診斷、修毛病"],
+      ["claude auth login/logout/status", "帳號登入／登出／看狀態"],
+      ["claude mcp", "設定 MCP 伺服器"],
+      ["claude plugin", "管理外掛"],
+      ["claude agents", "打開代理檢視，監控與分派背景 session"],
+    ] },
+  { tab: 5, name: "進階・跑腳本用", type: "啟動旗標",
+    summary: "自動化、批次或除錯情境才會用到，日常對話用不到。",
+    commands: [
+      ["-p / --print \"問題\"", "非互動：印出回應就退出，給腳本或管線用"],
+      ["--max-budget-usd <金額>", "API 花費達上限就停"],
+      ["--verbose", "開詳細 log"],
+      ["--safe-mode", "停用所有自訂功能啟動，排查問題用"],
+      ["--dangerously-skip-permissions", "跳過所有權限提示——很危險，一般別用"],
+    ], note: "最後一個會讓 Claude 不再問你就直接動手，只在你完全清楚後果時才用。" },
+
+  // ── Slash 指令：自建 ──
+  { tab: 6, name: "Heptabase LLM Wiki 指令", type: "自建・專案",
+    summary: "自己做的知識庫管理指令，只在 <code>Heptabase_LLM_Wiki</code> 資料夾（用 <code>cw</code> 進入）能用。",
+    commands: [
+      ["/ingest", "攝入新來源到 Wiki：子代理讀取 → 跟你討論 → 子代理歸檔。可帶網址／檔案／卡片名，留空＝處理收件匣最優先那件"],
+      ["/ingest-select", "掃兩個收件匣、列出所有待處理來源，讓你手動挑一件攝入"],
+      ["/lint", "健檢：找矛盾、孤兒卡、過時內容、結構問題，產出報告卡（檢查與修復都交子代理）"],
+      ["/query", "對 Wiki 提問，綜合回答，好答案可存回知識庫"],
+      ["/backup", "備份提醒：檢查上次備份時間，引導你手動 Export"],
+    ] },
+  { tab: 6, name: "/weather", type: "自建・全域",
+    summary: "查桃園區當日天氣，算出各狀態佔比後給一行可貼進日記的格式。",
+    usage: "<b>怎麼用：</b>打 <code>/weather</code>，也可帶地名或日期如 <code>/weather 台中北屯區</code>。每晚 22:00 另有 launchd 自動跑一次。" },
+
+  // ── Slash 指令：內建（自動載入的 skill 也可直接叫）──
+  { tab: 6, name: "Skill 直接呼叫", type: "內建概念",
+    summary: "所有 skill 名稱本身就是 slash 指令。前面 Skills 分頁那些（brainstorming、impeccable、docx…）都可以打 <code>/名稱</code> 直接指名使用，不用等它自動觸發。",
+    usage: "<b>怎麼用：</b>例如 <code>/brainstorming</code>、<code>/systematic-debugging</code>、<code>/pdf</code>。打 <code>/</code> 會跳出全部可用清單。" },
+  { tab: 6, name: "內建・對話與上下文", type: "內建指令",
+    summary: "管理當前對話、上下文空間與歷史回溯。",
+    commands: [
+      ["/clear", "開新的空對話（舊的可還原）"],
+      ["/compact", "把對話濃縮成摘要、釋放上下文空間，可附指示"],
+      ["/context", "把目前上下文用量畫成彩色網格"],
+      ["/rewind", "把程式碼和對話回滾到某個檢查點"],
+      ["/resume", "恢復到較早的對話"],
+      ["/branch", "從現在的位置開一條對話分支去試別的方向"],
+      ["/export", "把當前對話匯出成純文字"],
+      ["/copy", "複製最後一則回應到剪貼簿"],
+      ["/focus", "只顯示最後一次提問與最終回應的精簡視圖"],
+    ] },
+  { tab: 6, name: "內建・模型與模式", type: "內建指令",
+    summary: "切換模型、思考強度與工作模式。",
+    commands: [
+      ["/model", "切換 AI 模型並存成預設"],
+      ["/effort", "設思考努力級別（低／中／高／超高／最高）"],
+      ["/fast", "開關快速模式（Opus 加速輸出）"],
+      ["/plan", "切到計畫模式，大改動前先規劃"],
+      ["/goal", "設定目標，Claude 會做到條件滿足為止"],
+      ["/advisor", "開關顧問工具，讓第二個模型從旁給指導"],
+    ] },
+  { tab: 6, name: "內建・審查與除錯", type: "內建 skill",
+    summary: "程式碼審查、安全檢查、除錯這類附帶的 bundled skill。",
+    commands: [
+      ["/code-review", "審查目前 diff 的正確性錯誤與可簡化處，可加 --fix 直接修"],
+      ["/security-review", "檢查 diff 有沒有安全漏洞"],
+      ["/simplify", "只做清理式審查、套用簡化，不找 bug"],
+      ["/debug", "開除錯 log 並藉由讀 log 排查問題"],
+      ["/batch", "在整個程式庫協調大規模平行修改，每單元各跑一個 worktree"],
+      ["/doctor", "跑診斷、修安裝與設定的毛病"],
+    ] },
+  { tab: 6, name: "內建・工作流與研究", type: "內建 skill",
+    summary: "多步驟的自動化工作流。",
+    commands: [
+      ["/deep-research", "展開多輪網搜、交叉查證來源，產出附引用的報告"],
+      ["/loop", "重複跑某個提示，可自訂間隔或做維護巡檢"],
+      ["/dataviz", "圖表、圖形、儀表板的設計指導"],
+      ["/autofix-pr", "開一個網頁 session 盯著 PR，CI 失敗或有審查意見時自動推修復"],
+    ] },
+  { tab: 6, name: "內建・設定與權限", type: "內建指令",
+    summary: "調整偏好、權限、hooks、記憶、子代理、MCP。",
+    commands: [
+      ["/config", "打開設定介面調主題、模型等偏好"],
+      ["/permissions", "管理工具權限的允許／詢問／拒絕規則"],
+      ["/hooks", "查看工具事件的 hook 設定"],
+      ["/memory", "編輯 CLAUDE.md 記憶檔或啟用自動記憶"],
+      ["/agents", "建立或管理子代理設定"],
+      ["/mcp", "管理 MCP 伺服器連線與授權"],
+      ["/init", "用 CLAUDE.md 指南初始化專案"],
+      ["/add-dir", "在當前 session 加入可存取的工作目錄"],
+    ] },
+  { tab: 6, name: "內建・連線與裝置", type: "內建指令",
+    summary: "跨裝置接管、背景執行、瀏覽器與 IDE 整合。",
+    commands: [
+      ["/remote-control", "允許從另一台裝置接管這個本地 session"],
+      ["/teleport", "把網頁 session 拉進這個終端機"],
+      ["/desktop", "在 Claude Code 桌面 App 接續當前 session"],
+      ["/mobile", "顯示 QR code 下載手機 App"],
+      ["/background", "把當前 session 丟到背景執行、釋放終端機"],
+      ["/tasks", "列出這個 session 背景在跑的東西"],
+      ["/chrome", "設定 Claude in Chrome"],
+      ["/ide", "管理 IDE 整合並顯示狀態"],
+    ] },
+  { tab: 6, name: "內建・帳號與其他", type: "內建指令",
+    summary: "登入登出、用量、說明、安裝整合。",
+    commands: [
+      ["/login /logout", "登入／登出 Anthropic 帳號"],
+      ["/usage", "顯示用量統計與費用（別名 /cost）"],
+      ["/help", "顯示說明與可用指令"],
+      ["/insights", "產一份分析你 Claude Code 使用情況的報告"],
+      ["/feedback", "回報 bug、給意見或分享對話"],
+      ["/install-github-app", "幫 repo 裝 Claude GitHub App"],
+      ["/install-slack-app", "裝 Claude Slack App"],
+      ["/diff", "打開互動式 diff 檢視器看未提交的變更"],
+    ] },
+
+  // ── 自動化・防護 ──
+  { tab: 7, name: "Heptabase 守門 hook", type: "安全防護",
+    summary: "全域 PreToolUse hook（heptabase_guard.py）：機器強制擋掉「刪卡片」和「寫入日誌」兩件事，Claude 執行不了。",
+    usage: "<b>怎麼用：</b>不用做什麼，它一直在。被擋是正常現象；真要刪卡由你自己在 Heptabase App 操作。" },
+  { tab: 7, name: "權限白名單／黑名單", type: "安全防護",
+    summary: "settings.json 裡的規則：封鎖 <code>rm -rf</code>、<code>sudo</code>、force push 等危險指令；放行 jq、heptabase、固定參數的 aider。",
+    usage: "<b>怎麼用：</b>自動生效。要調整規則時跟 Claude 說，改動 settings.json 前會先徵求你同意。" },
+  { tab: 7, name: "每晚天氣紀錄", type: "launchd 排程",
+    summary: "launchd 排程（com.cloud.weather-daily）每晚 22:00 自動跑 /weather，把日記格式的一行天氣寫進 weather_log.txt。",
+    usage: "<b>怎麼用：</b>全自動。寫日記時去 <code>~/Downloads/0_TMP/weather_log.txt</code> 撈當天那行。" },
+  { tab: 7, name: "GCP 試用金到期提醒", type: "launchd 排程",
+    summary: "launchd 排程（com.cloud.gcp-trial-reminder）在 2026/10/01 和 10/09 跳 Mac 通知，提醒處理 $300 試用金到期。",
+    usage: "<b>怎麼用：</b>全自動。收到通知後找 Claude 一起清理 API key 和專案。" },
+  { tab: 7, name: "記憶系統", type: "跨 session",
+    summary: "Claude 的長期記憶：偏好、專案狀態、工作方法存成記憶檔，每個新 session 自動載入索引。",
+    usage: "<b>怎麼用：</b>說「記住這件事」就會存檔；重要決定和教訓 Claude 也會主動記。" },
+  { tab: 7, name: "CLAUDE.md 全域偏好", type: "跨 session",
+    summary: "<code>~/.claude/CLAUDE.md</code>：語言與語氣、做事哲學（長遠優先）、風險操作守則、檔案命名、Heptabase 安全守則等，每個 session 都遵守。",
+    usage: "<b>怎麼用：</b>要新增或修改全域規矩時跟 Claude 說，直接幫你改這份檔案。" },
+  { tab: 7, name: "ccstatusline 狀態列", type: "介面",
+    summary: "Claude Code 底部的自訂狀態列，顯示模型、用量等即時資訊。",
+    usage: "<b>怎麼用：</b>自動顯示。想改樣式跑 <code>npx ccstatusline@latest</code> 進設定介面。" },
+
+  // ── as-code 工具（用時才生成的專案框架，非常駐）──
+  { tab: 8, name: "Open Slide", type: "待試・未安裝",
+    summary: "「投影片即程式碼」框架：自然語言描述 → agent 寫成 React 投影片，固定 1920×1080 畫布、即時預覽、瀏覽器點元素下註解再套用、簡報者模式，可匯出靜態 HTML／PDF。同類作品：Slidev、Reveal.js、Marp。",
+    usage: "<b>怎麼用：</b>非常駐、用時才建專案：<code>npx @open-slide/cli init 專案名</code> → <code>pnpm dev</code>。skills（create-slide、slide-authoring…）內建在該專案裡，只在那個資料夾生效。需要先用 corepack 裝 pnpm。",
+    note: "還沒安裝，這裡先記著之後試。跟現有 pptx（產 .pptx）、ui-ux-pro-max:slides（HTML 簡報）是三種不同路線的簡報工具。" },
+];
+
+const tabsEl = document.getElementById("tabs");
+const gridEl = document.getElementById("grid");
+const emptyEl = document.getElementById("empty");
+const hintEl = document.getElementById("hint");
+const qEl = document.getElementById("q");
+let activeTab = 0;
+
+TABS.forEach((label, i) => {
+  const count = TOOLS.filter(t => t.tab === i).length;
+  const btn = document.createElement("button");
+  btn.className = "tab" + (i === 0 ? " active" : "");
+  btn.innerHTML = `${label}<span class="count">${count}</span>`;
+  btn.addEventListener("click", () => {
+    activeTab = i;
+    qEl.value = "";
+    document.querySelectorAll(".tab").forEach((b, j) => b.classList.toggle("active", j === i));
+    render();
+  });
+  tabsEl.appendChild(btn);
+});
+
+function cardHTML(t) {
+  let body = "";
+  if (t.commands) {
+    body = `<ul class="cmdlist">` + t.commands.map(c =>
+      `<li><code>${c[0]}</code><span>${c[1]}</span></li>`).join("") + `</ul>`;
+  } else if (t.usage) {
+    body = `<p class="usage">${t.usage}</p>`;
+  }
+  return `<article class="card">
+    <div class="card-head">
+      <h3>${t.name}</h3>
+      <span>
+        <span class="chip">${t.type}</span><span class="tabchip">${TABS[t.tab]}</span>
+      </span>
+    </div>
+    <p class="summary">${t.summary}</p>
+    ${body}
+    ${t.note ? `<p class="note">${t.note}</p>` : ""}
+  </article>`;
+}
+
+function render() {
+  const q = qEl.value.trim().toLowerCase();
+  const searching = q.length > 0;
+  document.body.classList.toggle("searching", searching);
+  hintEl.style.display = searching ? "block" : "none";
+
+  const shown = TOOLS.filter(t => {
+    if (searching) {
+      const cmdText = t.commands ? t.commands.map(c => c[0] + c[1]).join(" ") : "";
+      const hay = (t.name + t.type + t.summary + (t.usage || "") + cmdText + (t.note || "")).toLowerCase();
+      return hay.includes(q);
+    }
+    return t.tab === activeTab;
+  });
+
+  gridEl.innerHTML = shown.map(cardHTML).join("");
+  emptyEl.style.display = shown.length ? "none" : "block";
+}
+
+qEl.addEventListener("input", render);
+render();
+</script>
+</body>
+</html>
