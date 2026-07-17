@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/07/15</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」</p>
+      <p class="meta">最後更新 <b>2026/07/18</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -536,7 +536,8 @@ const TOOLS = [
     usage: "<b>怎麼用：</b>要新增或修改全域規矩時跟 Claude 說，直接幫你改這份檔案。" },
   { tab: 7, name: "ccstatusline 狀態列", type: "介面",
     summary: "Claude Code 底部的自訂狀態列，顯示模型、用量等即時資訊。",
-    usage: "<b>怎麼用：</b>自動顯示。想改樣式跑 <code>npx ccstatusline@latest</code> 進設定介面。" },
+    usage: "<b>怎麼用：</b>自動顯示。想改樣式跑 <code>npx ccstatusline@latest</code> 進設定介面。",
+    note: "已透過 <code>~/.claude/statusline-wrapper.sh</code> 接上 RunCat Neo（macOS 選單列跑貓 App）：wrapper 把 session 資料同時餵給 ccstatusline（畫狀態列）和 <code>runcat-statusline.py</code>（寫 <code>~/.claude/runcat-usage.json</code>），讓 RunCat 的選單列卡片顯示模型／Context／5h／7d 用量。兩者並存、不衝突。" },
 
   // ── as-code 工具（用時才生成的專案框架，非常駐）──
   { tab: 8, name: "Open Slide", type: "待試・未安裝",
