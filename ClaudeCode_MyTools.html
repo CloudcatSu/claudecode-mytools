@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/07/18</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」</p>
+      <p class="meta">最後更新 <b>2026/07/24</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -246,7 +246,7 @@
 </div>
 
 <script>
-const TABS = ["Skills", "外掛包", "MCP・連接器", "本地 AI・CLI", "終端機捷徑", "CLI 啟動參數", "Slash 指令", "自動化・防護", "as-code 工具"];
+const TABS = ["Skills", "外掛包", "MCP・連接器", "本地 AI・CLI", "終端機捷徑", "CLI 啟動參數", "Slash 指令", "自動化・防護", "as-code 工具", "參考資料"];
 
 const TOOLS = [
   // ── Skills ──
@@ -544,6 +544,17 @@ const TOOLS = [
     summary: "「投影片即程式碼」框架：自然語言描述 → agent 寫成 React 投影片，固定 1920×1080 畫布、即時預覽、瀏覽器點元素下註解再套用、簡報者模式，可匯出靜態 HTML／PDF。同類作品：Slidev、Reveal.js、Marp。",
     usage: "<b>怎麼用：</b>非常駐、用時才建專案：<code>npx @open-slide/cli init 專案名</code> → <code>pnpm dev</code>。skills（create-slide、slide-authoring…）內建在該專案裡，只在那個資料夾生效。需要先用 corepack 裝 pnpm。",
     note: "還沒安裝，這裡先記著之後試。跟現有 pptx（產 .pptx）、ui-ux-pro-max:slides（HTML 簡報）是三種不同路線的簡報工具。" },
+
+  // ── 參考資料 ──
+  { tab: 9, name: "Kinetics", type: "外部資源・動畫",
+    summary: "Spring physics 動畫效果庫，超過 117 種介面動畫，可調彈簧硬度與阻尼，比固定時間緩動更有物理質感。",
+    usage: "<b>怎麼用：</b>選好效果後可直接複製 CSS、React 或 AI 提示詞貼進專案。<br><a href=\"https://kinetics.colorion.co/\" style=\"color:var(--accent)\">kinetics.colorion.co</a>" },
+  { tab: 9, name: "21st.dev", type: "外部資源・元件",
+    summary: "React 元件的社群註冊表，收錄超過 10,000 個設計師與工程師做的 UI 組件。",
+    usage: "<b>怎麼用：</b>找到喜歡的元件、複製提示詞貼給 AI 編碼工具，就能自動組出程式碼。<br><a href=\"https://21st.dev/\" style=\"color:var(--accent)\">21st.dev</a>" },
+  { tab: 9, name: "design.md", type: "外部資源・設計系統",
+    summary: "設計系統分析平台，提供各類網站的 DESIGN.md 文件，把一個網站的設計邏輯整理成可讀文檔。",
+    usage: "<b>怎麼用：</b>下載某網站的 DESIGN.md，餵給 Claude、Cursor 等 AI 編碼工具或網頁產生器當設計參考。<br><a href=\"https://getdesign.md/design-md\" style=\"color:var(--accent)\">getdesign.md/design-md</a>" },
 ];
 
 const tabsEl = document.getElementById("tabs");
