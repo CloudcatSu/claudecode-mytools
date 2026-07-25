@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/07/24</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」</p>
+      <p class="meta">最後更新 <b>2026/07/26</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -300,6 +300,10 @@ const TOOLS = [
     summary: "第三方 UI/UX 知識庫：配色、字體搭配、無障礙規則、各框架最佳實踐。",
     usage: "<b>怎麼用：</b>做介面或檢查介面時當參考依據，可以指名「用 ui-ux-pro-max 檢查」。",
     note: "2026/07 安裝時已檢查過程式碼，但內容當參考就好、不無條件全信。" },
+  { tab: 1, name: "Discord", type: "官方 plugin",
+    summary: "Discord bot 整合：讀訊息、回覆、加表情反應、編輯訊息、下載附件，讓 Claude Code 能透過 Discord 頻道對話。",
+    usage: "<b>怎麼用：</b>在允許的頻道傳訊息就會自動回覆；設定 bot token、管理配對與允許名單用 <code>/discord:configure</code>、<code>/discord:access</code>。",
+    note: "頻道允許名單除了 Cloud 本人，還有老婆 sandrachen32，她的請求限定查資料／文書處理／視覺設計三類，其餘一律婉拒。" },
 
   // ── MCP・連接器 ──
   { tab: 2, name: "Firecrawl", type: "自裝 MCP",
@@ -330,6 +334,9 @@ const TOOLS = [
     summary: "讀白板、卡片、標籤、日誌，做語意搜尋，是個人知識庫的查詢入口。",
     usage: "<b>怎麼用：</b>查詢用 MCP 就好；放卡上白板、加標籤等寫入操作改用 Heptabase CLI。",
     note: "日誌唯讀、不刪卡，有 hook 機器強制擋著。" },
+  { tab: 2, name: "Wix", type: "內建連接器",
+    summary: "讀寫 Wix 網站：建立/管理網站、查文件與 API 規格、上傳圖片、串接 Wix Headless／CLI。",
+    usage: "<b>怎麼用：</b>貼 wixsite.com 連結，或說要改作品集網站、火水造物官網相關的 Wix 內容時使用。" },
 
   // ── 本地 AI・CLI ──
   { tab: 3, name: "Ollama + Gemma 12B", type: "本地模型",
@@ -464,6 +471,7 @@ const TOOLS = [
     summary: "程式碼審查、安全檢查、除錯這類附帶的 bundled skill。",
     commands: [
       ["/code-review", "審查目前 diff 的正確性錯誤與可簡化處，可加 --fix 直接修"],
+      ["/review", "審查一個 GitHub PR（自己手上的 diff用 /code-review）"],
       ["/security-review", "檢查 diff 有沒有安全漏洞"],
       ["/simplify", "只做清理式審查、套用簡化，不找 bug"],
       ["/debug", "開除錯 log 並藉由讀 log 排查問題"],
@@ -475,7 +483,10 @@ const TOOLS = [
     commands: [
       ["/deep-research", "展開多輪網搜、交叉查證來源，產出附引用的報告"],
       ["/loop", "重複跑某個提示，可自訂間隔或做維護巡檢"],
+      ["/schedule", "建立、管理排程好的雲端代理（cron 排程的例行任務），也支援單次未來排程"],
       ["/dataviz", "圖表、圖形、儀表板的設計指導"],
+      ["/run", "啟動並操作這個專案的 App，實際看修改結果（CLI／伺服器／瀏覽器等各種專案類型都適用）"],
+      ["/claude-api", "Claude API／Anthropic SDK 速查：model id、價格、串流、tool use、快取、模型遷移"],
       ["/autofix-pr", "開一個網頁 session 盯著 PR，CI 失敗或有審查意見時自動推修復"],
     ] },
   { tab: 6, name: "內建・設定與權限", type: "內建指令",
@@ -489,6 +500,9 @@ const TOOLS = [
       ["/mcp", "管理 MCP 伺服器連線與授權"],
       ["/init", "用 CLAUDE.md 指南初始化專案"],
       ["/add-dir", "在當前 session 加入可存取的工作目錄"],
+      ["/update-config", "透過 settings.json 設定自動化行為：hooks、權限、環境變數"],
+      ["/keybindings-help", "自訂鍵盤快捷鍵、改綁按鍵、設定組合鍵"],
+      ["/fewer-permission-prompts", "掃描對話紀錄裡常見的唯讀指令，自動加進允許清單、減少權限詢問"],
     ] },
   { tab: 6, name: "內建・連線與裝置", type: "內建指令",
     summary: "跨裝置接管、背景執行、瀏覽器與 IDE 整合。",
@@ -528,6 +542,15 @@ const TOOLS = [
   { tab: 7, name: "GCP 試用金到期提醒", type: "launchd 排程",
     summary: "launchd 排程（com.cloud.gcp-trial-reminder）在 2026/10/01 和 10/09 跳 Mac 通知，提醒處理 $300 試用金到期。",
     usage: "<b>怎麼用：</b>全自動。收到通知後找 Claude 一起清理 API key 和專案。" },
+  { tab: 7, name: "Claude Code 使用週報", type: "launchd 排程",
+    summary: "launchd 排程（com.cloud.insights-weekly）每週三 22:00 執行 InsightsReport：自建統計（用量、成本、工具用量的週對週數字）＋官方 /insights 質性分析（翻繁中）＋敘事，產出 HTML 週報。",
+    usage: "<b>怎麼用：</b>全自動，本機產出、本機閱讀。週報在 <code>0_設定方式備份/InsightsReport/index.html</code>，含專案名稱與成本等私人資訊，不對外發佈。" },
+  { tab: 7, name: "工具總覽網頁自動更新", type: "launchd 排程",
+    summary: "launchd 排程（com.cloud.mytools-weekly）每週三 23:00 呼叫 headless claude 重掃環境、比對這份工具總覽頁的內容，有差異才改 HTML 並自動 commit + push。",
+    usage: "<b>怎麼用：</b>全自動，就是這份頁面每週自我更新的機制。工作目錄不乾淨或掃描後沒差異都會直接跳過、不 commit。" },
+  { tab: 7, name: "Ollama 跨來源存取", type: "launchd 排程",
+    summary: "launchd 排程（com.cloudsu.ollama-origins）開機登入時自動設定環境變數 OLLAMA_ORIGINS=*，讓瀏覽器擴充功能等其他來源也能打本機 Ollama API。",
+    usage: "<b>怎麼用：</b>全自動，不用管。" },
   { tab: 7, name: "記憶系統", type: "跨 session",
     summary: "Claude 的長期記憶：偏好、專案狀態、工作方法存成記憶檔，每個新 session 自動載入索引。",
     usage: "<b>怎麼用：</b>說「記住這件事」就會存檔；重要決定和教訓 Claude 也會主動記。" },
