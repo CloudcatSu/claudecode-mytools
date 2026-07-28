@@ -544,7 +544,7 @@ const TOOLS = [
     usage: "<b>怎麼用：</b>全自動。收到通知後找 Claude 一起清理 API key 和專案。" },
   { tab: 7, name: "Claude Code 使用週報", type: "launchd 排程",
     summary: "launchd 排程（com.cloud.insights-weekly）每週三 22:00 執行 InsightsReport：自建統計（用量、成本、工具用量的週對週數字）＋官方 /insights 質性分析（翻繁中）＋敘事，產出 HTML 週報。",
-    usage: "<b>怎麼用：</b>全自動，本機產出、本機閱讀。週報在 <code>0_設定方式備份/InsightsReport/index.html</code>，含專案名稱與成本等私人資訊，不對外發佈。" },
+    usage: "<b>怎麼用：</b>全自動，本機產出、本機閱讀。週報在 <code>0_ConfigAndReports/InsightsReport/index.html</code>，含專案名稱與成本等私人資訊，不對外發佈。" },
   { tab: 7, name: "工具總覽網頁自動更新", type: "launchd 排程",
     summary: "launchd 排程（com.cloud.mytools-weekly）每週三 23:00 呼叫 headless claude 重掃環境、比對這份工具總覽頁的內容，有差異才改 HTML 並自動 commit + push。",
     usage: "<b>怎麼用：</b>全自動，就是這份頁面每週自我更新的機制。工作目錄不乾淨或掃描後沒差異都會直接跳過、不 commit。" },
