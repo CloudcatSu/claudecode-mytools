@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/07/26</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
+      <p class="meta">最後更新 <b>2026/07/29</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -395,6 +395,7 @@ const TOOLS = [
       ["--add-dir <路徑>", "啟動就多掛一個可讀寫的工作目錄"],
       ["--permission-mode <模式>", "用指定的權限模式啟動"],
       ["--fallback-model <名稱>", "主模型過載時自動退到指定備援模型"],
+      ["--agent <名稱>", "指定用哪個子代理設定啟動這個 session"],
     ] },
   { tab: 5, name: "連線與裝置", type: "啟動旗標",
     summary: "啟動時就開好跨裝置、瀏覽器、IDE 或背景執行。",
@@ -415,6 +416,10 @@ const TOOLS = [
       ["claude mcp", "設定 MCP 伺服器"],
       ["claude plugin", "管理外掛"],
       ["claude agents", "打開代理檢視，監控與分派背景 session"],
+      ["claude attach/logs/stop/rm/respawn <id>", "接回／看輸出／停止／移除／重啟某個背景 session"],
+      ["claude remote-control", "啟動遠端控制伺服器，讓 claude.ai 能操控本機"],
+      ["claude ultrareview [target]", "非互動跑 ultrareview（多代理雲端審查，即 /code-review ultra）"],
+      ["claude project purge [路徑]", "清掉某專案在本機殘留的所有 Claude Code 狀態"],
     ] },
   { tab: 5, name: "進階・跑腳本用", type: "啟動旗標",
     summary: "自動化、批次或除錯情境才會用到，日常對話用不到。",
@@ -423,6 +428,8 @@ const TOOLS = [
       ["--max-budget-usd <金額>", "API 花費達上限就停"],
       ["--verbose", "開詳細 log"],
       ["--safe-mode", "停用所有自訂功能啟動，排查問題用"],
+      ["--bare", "最精簡模式啟動：跳過 hooks、skills、plugins、MCP 自動載入"],
+      ["--allowedTools / --disallowedTools", "設定哪些工具不必詢問就能用、哪些一律禁用"],
       ["--dangerously-skip-permissions", "跳過所有權限提示——很危險，一般別用"],
     ], note: "最後一個會讓 Claude 不再問你就直接動手，只在你完全清楚後果時才用。" },
 
@@ -453,6 +460,9 @@ const TOOLS = [
       ["/rewind", "把程式碼和對話回滾到某個檢查點"],
       ["/resume", "恢復到較早的對話"],
       ["/branch", "從現在的位置開一條對話分支去試別的方向"],
+      ["/fork", "把目前對話複製成一個新的背景 session 繼續跑"],
+      ["/btw", "問一個旁支小問題，不會存進正式對話紀錄"],
+      ["/cd <路徑>", "把整個 session 換到新的工作目錄"],
       ["/export", "把當前對話匯出成純文字"],
       ["/copy", "複製最後一則回應到剪貼簿"],
       ["/focus", "只顯示最後一次提問與最終回應的精簡視圖"],
@@ -488,6 +498,7 @@ const TOOLS = [
       ["/run", "啟動並操作這個專案的 App，實際看修改結果（CLI／伺服器／瀏覽器等各種專案類型都適用）"],
       ["/claude-api", "Claude API／Anthropic SDK 速查：model id、價格、串流、tool use、快取、模型遷移"],
       ["/autofix-pr", "開一個網頁 session 盯著 PR，CI 失敗或有審查意見時自動推修復"],
+      ["/design-sync", "把 repo 的 React 設計系統轉換、上傳到 Claude Design（需先 /design-login 授權一次）"],
     ] },
   { tab: 6, name: "內建・設定與權限", type: "內建指令",
     summary: "調整偏好、權限、hooks、記憶、子代理、MCP。",
