@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/07/29</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
+      <p class="meta">最後更新 <b>2026/08/05</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -322,6 +322,10 @@ const TOOLS = [
   { tab: 2, name: "Playwright", type: "自裝 MCP",
     summary: "操作瀏覽器：開網頁、點擊、填表單、截圖，適合要「模擬真人操作」或登入後才看得到的頁面。",
     usage: "<b>怎麼用：</b>說「用瀏覽器打開／操作某網站」即可，不需要 API key。" },
+  { tab: 2, name: "koboyo-icons", type: "自裝 MCP",
+    summary: "找圖示（icon）用的 MCP：依用途或關鍵字搜尋、直接拿 SVG。",
+    usage: "<b>怎麼用：</b>需要介面圖示時可以指名用它。",
+    note: "2026/08 新增，掃描當下還沒登入授權，工具暫時回不了圖示。要用的話先到 <a href=\"https://koboyo.com/icons?mcp=1\" style=\"color:var(--accent)\">koboyo.com/icons?mcp=1</a> 登入拿專屬設定指令，重新加回這個 MCP 伺服器。" },
   { tab: 2, name: "Claude in Chrome", type: "內建連接器",
     summary: "直接操控你正在用的 Chrome 分頁：讀頁面、點按、錄 GIF、看 console 和網路請求。",
     usage: "<b>怎麼用：</b>說「看我現在開的分頁」「幫我操作這個網頁」。與 Playwright 的差別：這個用的是你本人登入狀態的瀏覽器。" },
@@ -417,7 +421,7 @@ const TOOLS = [
       ["--bg / --background", "以背景代理身分啟動、立刻放你回終端機"],
       ["-w / --worktree", "在隔離的 git worktree 裡啟動"],
       ["--tmux", "幫 worktree 開 tmux session（要搭配 --worktree，有 iTerm2 就用原生分割窗）"],
-    ], note: "啟動旗標 <code>--teleport</code> 已不在 CLI 說明裡（v2.1.220 掃描結果），要把網頁 session 拉回終端機請用對話框的 <code>/teleport</code>。" },
+    ], note: "啟動旗標 <code>--teleport</code> 已不在 CLI 說明裡（v2.1.222 掃描結果），要把網頁 session 拉回終端機請用對話框的 <code>/teleport</code>。" },
   { tab: 5, name: "claude 子命令", type: "子命令",
     summary: "接在 claude 後面的動作字（不是旗標），用來做維護或設定，不會進入對話。",
     commands: [
