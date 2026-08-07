@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/08/05</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
+      <p class="meta">最後更新 <b>2026/08/07</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -314,6 +314,10 @@ const TOOLS = [
     summary: "Discord bot 整合：讀訊息、回覆、加表情反應、編輯訊息、下載附件，讓 Claude Code 能透過 Discord 頻道對話。",
     usage: "<b>怎麼用：</b>在允許的頻道傳訊息就會自動回覆；設定 bot token、管理配對與允許名單用 <code>/discord:configure</code>、<code>/discord:access</code>。",
     note: "訪客守則（老婆 sandrachen32 的請求限定查資料／文書處理／視覺設計三類）已移到 <code>~/ClaudeCode/1_DiscordBot/CLAUDE.md</code>，在那個資料夾開 session 才載入。全機只維護這一個 Discord session。" },
+  { tab: 1, name: "claude-seo", type: "待試・未安裝",
+    summary: "第三方 SEO 稽核 plugin（<a href=\"https://github.com/AgriciDaniel/claude-seo\" style=\"color:var(--accent)\">AgriciDaniel/claude-seo</a>，MIT、13.5k stars）：21 個 skill + 18 個 subagent 平行跑全站稽核，涵蓋技術 SEO、E-E-A-T 內容品質、schema、sitemap、Core Web Vitals、圖片、GEO/AEO、在地 SEO，產出有優先順序的行動清單與 PDF／Excel 報告。",
+    usage: "<b>怎麼用：</b>裝了之後打 <code>/seo audit 網址</code>。<b>不用任何 API key</b> 就能跑的：audit、page、technical、content、schema、sitemap generate、images、cluster、plan。接免費的 Google API（PageSpeed／Search Console／GA4）可解鎖真實使用者數據，付費的 Ahrefs、DataForSEO 全是選配。",
+    note: "<b>刻意保留的待辦條目，非環境掃描結果，每週重掃時請勿移除。</b><br>2026/08/07 研究過、決定先不裝，等火水造物案子重啟時再評估，屆時先看更新到哪一版（研究當下為 v2.2.4）。<br><b>裝之前要留意三件事：</b>① 建議走 <code>/plugin marketplace add AgriciDaniel/claude-seo</code>，別跑 install.sh——後者會把 21 個 skill 和 18 個 agent 直接倒進 <code>~/.claude/skills/</code> 與 <code>~/.claude/agents/</code>，難移除也拉長每個 session 的 skill 清單。② 它帶一個全域 <code>PostToolUse</code> hook，任何 Edit／Write 都會觸發 schema 驗證，等於在所有專案都多跑一段。③ 安裝會建獨立 Python 環境並下載 Playwright Chromium，體積不小。" },
 
   // ── MCP・連接器 ──
   { tab: 2, name: "Firecrawl", type: "自裝 MCP",
