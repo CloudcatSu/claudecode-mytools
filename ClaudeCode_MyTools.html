@@ -375,6 +375,10 @@ const TOOLS = [
   { tab: 3, name: "trash", type: "安全工具",
     summary: "把「刪除」改成「丟垃圾桶」的小工具，終端機的 <code>rm</code> 已經全域改指向它。",
     usage: "<b>怎麼用：</b>平常照打 <code>rm</code> 就是可還原的刪除；真要永久刪除才用 <code>rm!</code>。" },
+  { tab: 3, name: "phone-harness", type: "待試・未安裝",
+    summary: "第三方工具（<a href=\"https://github.com/ShawnPana/phone-harness\" style=\"color:var(--accent)\">ShawnPana/phone-harness</a>，MIT、Python）：讓 AI agent 直接操控真實 iPhone，免越獄、免 Xcode、免 WebDriverAgent，靠 macOS 的「iPhone 鏡像」視窗當傳輸層——用 <code>screencapture</code> + Vision 框架 OCR 當眼睛（辨識畫面文字給座標），HID 層級的 CGEvents 當手（點擊／長按／滑動／打字）。",
+    usage: "<b>怎麼用：</b>安裝後 clone 進 <code>~/.phone-harness</code>，讓 <code>phone-harness</code> 變成 PATH 上的指令並註冊成 agent skill，之後 Claude Code 會自動使用。設定需要人工做兩件事：跟手機配對一次「iPhone 鏡像」，以及在系統設定給終端機 Accessibility + 螢幕錄製權限，跑 <code>--doctor</code> 驗證。",
+    note: "<b>刻意保留的待辦條目，非環境掃描結果，每週重掃時請勿移除。</b><br>2026/08/11 記錄，先不裝，之後再測試。<br><b>限制：</b>一次只能連一支手機、且解鎖手機本體會暫停鏡像；不支援多點觸控（無法縮放）；無法過攝影機／Face ID 流程；有 DRM 保護的影片畫面會全黑；OCR 只認得到文字，沒有標籤的圖示得另外截圖給看得懂圖的模型判斷。" },
 
   // ── 終端機捷徑 ──
   { tab: 4, name: "cc", type: "終端機指令",
