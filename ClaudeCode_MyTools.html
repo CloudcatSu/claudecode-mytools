@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/08/11</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
+      <p class="meta">最後更新 <b>2026/08/12</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -260,6 +260,9 @@ const TOOLS = [
   { tab: 0, name: "googleMaps", type: "自建 skill",
     summary: "用自己的 Google Maps API key 查地點、商家、路線、天氣、空氣品質。",
     usage: "<b>怎麼用：</b>問停車場、找店家、規劃行程動線、查營業時間或當地天氣時自動觸發，不用明講 Google Maps。" },
+  { tab: 0, name: "tdx", type: "自建 skill",
+    summary: "用交通部 TDX 運輸資料流通服務查台灣大眾運輸與路況：公車到站、台鐵高鐵捷運時刻票價、停車場剩餘車位、國道省道路況、YouBike 可借數。",
+    usage: "<b>怎麼用：</b>問公車幾分鐘到、時刻表、停車位、路況、YouBike 時自動觸發，不用明講 TDX——這些是 Google Maps 查不到的台灣在地即時資料，憑證已存在本機走 OAuth2。" },
   { tab: 0, name: "helperDelegation", type: "自建 skill",
     summary: "三層派工原則：把大量、簡單或超長的活外包給免費幫手（本機 Ollama Gemma、Gemini CLI、Haiku 子代理），主模型只出題、收結論、做判斷。",
     usage: "<b>怎麼用：</b>批次翻譯／摘要／改寫、要讀超長文件、掃大量檔案時自動啟用；也可以說「這個派給幫手做」「幫我省 token」。" },
@@ -329,7 +332,7 @@ const TOOLS = [
   { tab: 2, name: "koboyo-icons", type: "自裝 MCP",
     summary: "找圖示（icon）用的 MCP：依用途或關鍵字搜尋、直接拿 SVG。",
     usage: "<b>怎麼用：</b>需要介面圖示時可以指名用它。",
-    note: "2026/08 新增，掃描當下還沒登入授權，工具暫時回不了圖示。要用的話先到 <a href=\"https://koboyo.com/icons?mcp=1\" style=\"color:var(--accent)\">koboyo.com/icons?mcp=1</a> 登入拿專屬設定指令，重新加回這個 MCP 伺服器。" },
+    note: "2026/08 新增，掃描當下還沒登入授權，工具暫時回不了圖示。要用的話先到 <a href=\"https://koboyo.com/mcp\" style=\"color:var(--accent)\">koboyo.com/mcp</a> 登入拿專屬設定指令，重新加回這個 MCP 伺服器。" },
   { tab: 2, name: "Claude in Chrome", type: "內建連接器",
     summary: "直接操控你正在用的 Chrome 分頁：讀頁面、點按、錄 GIF、看 console 和網路請求。",
     usage: "<b>怎麼用：</b>說「看我現在開的分頁」「幫我操作這個網頁」。與 Playwright 的差別：這個用的是你本人登入狀態的瀏覽器。" },
@@ -585,6 +588,15 @@ const TOOLS = [
   { tab: 7, name: "Ollama 跨來源存取", type: "launchd 排程",
     summary: "launchd 排程（com.cloudsu.ollama-origins）開機登入時自動設定環境變數 OLLAMA_ORIGINS=*，讓瀏覽器擴充功能等其他來源也能打本機 Ollama API。",
     usage: "<b>怎麼用：</b>全自動，不用管。" },
+  { tab: 7, name: "TDX 即時性快照", type: "launchd 排程",
+    summary: "launchd 排程（com.cloudsu.tdxsnapshot）每天凌晨 2:30 打一輪國道路況、YouBike、台鐵、停車場、高鐵等 TDX 指標，用來驗證這些欄位是真的即時更新、不是靜態快照。",
+    usage: "<b>怎麼用：</b>全自動，輸出存在 <code>~/Downloads/0_TMP/tdx_snap/</code>。" },
+  { tab: 7, name: "transport-lookup 子代理", type: "自訂子代理",
+    summary: "查交通與地點資料的專用子代理，涵蓋 Google Maps（店家景點、路線、天氣空品）與 TDX（公車、台鐵高鐵、停車、路況、YouBike），實際打 API 拿真實資料再整理成精簡結論，不丟原始 JSON。",
+    usage: "<b>怎麼用：</b>已預先授權自動委派，不用先問。條件不全會直接用預設值查（沒講路線用固定公車、沒講日期當今天），不會反問你。" },
+  { tab: 7, name: "pptx-builder 子代理", type: "自訂子代理",
+    summary: "簡報內容與方向已經談定、只剩「動手做出 .pptx 檔案」這段時的專用子代理。",
+    usage: "<b>怎麼用：</b>已預先授權自動委派。它回報的「需要你決定的事項」會原封轉述給你，不會自己替你決定。" },
   { tab: 7, name: "記憶系統", type: "跨 session",
     summary: "Claude 的長期記憶：偏好、專案狀態、工作方法存成記憶檔，每個新 session 自動載入索引。",
     usage: "<b>怎麼用：</b>說「記住這件事」就會存檔；重要決定和教訓 Claude 也會主動記。" },
