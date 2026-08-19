@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/08/12</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
+      <p class="meta">最後更新 <b>2026/08/19</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -270,6 +270,10 @@ const TOOLS = [
     summary: "拷問式討論：把還沒想清楚的計畫、決定或想法一路問到清晰，一次問一個問題、把決策樹每條分支都走完。",
     usage: "<b>怎麼用：</b>說「拷問我」「討論一下」「幫我想清楚」，或談非程式的事（買東西、生意決定、內容規劃、生活安排）時自動啟用。",
     note: "跟 brainstorming 的分工：方向還沒定、或根本不是程式的事 → grill-me；方向定了要動工寫程式 → brainstorming。" },
+  { tab: 0, name: "watch", type: "自建 skill",
+    summary: "額度重置後自動續跑的控制台：把撞到用量上限的 session 加進監控名單，5 小時窗口一重置就自動把它們叫醒接著跑。",
+    usage: "<b>怎麼用：</b>在一個專門的監視 session 裡說「監控某某視窗」「現在監控哪些」「移除某個」，或提到 autocontinue、自動續跑時自動啟用。名單存在檔案裡，監視 session 不用一直開著。",
+    note: "門檻預設重置前用量要到 90% 才喚醒；叫醒成功就從名單移除（要繼續監控得重新加）。只吃 5 小時窗口，撞到週限額不會動。" },
   { tab: 0, name: "numbers-reader", type: "自建 skill",
     summary: "讀 Apple Numbers 檔（.numbers）。這是 Protobuf + Snappy 二進位格式，沒有專用工具讀不了，環境已備妥 venv 與 cat-numbers CLI。",
     usage: "<b>怎麼用：</b>提到 .numbers 檔或要從 Numbers 試算表抓資料時自動啟用，丟檔案路徑就好。" },
@@ -316,7 +320,7 @@ const TOOLS = [
   { tab: 1, name: "Discord", type: "官方 plugin",
     summary: "Discord bot 整合：讀訊息、回覆、加表情反應、編輯訊息、下載附件，讓 Claude Code 能透過 Discord 頻道對話。",
     usage: "<b>怎麼用：</b>在允許的頻道傳訊息就會自動回覆；設定 bot token、管理配對與允許名單用 <code>/discord:configure</code>、<code>/discord:access</code>。",
-    note: "訪客守則（老婆 sandrachen32 的請求限定查資料／文書處理／視覺設計三類）已移到 <code>~/ClaudeCode/1_DiscordBot/CLAUDE.md</code>，在那個資料夾開 session 才載入。全機只維護這一個 Discord session。" },
+    note: "已改成只在 <code>1_DiscordBot</code> 資料夾生效：全域 <code>settings.json</code> 把它關掉，改由該專案的 <code>.claude/settings.json</code> 單獨開啟，其他資料夾的 session 不再載入這個 plugin。訪客守則（老婆 sandrachen32 的請求限定查資料／文書處理／視覺設計三類）同樣放在 <code>~/ClaudeCode/1_DiscordBot/CLAUDE.md</code>。全機只維護這一個 Discord session。" },
   { tab: 1, name: "claude-seo", type: "待試・未安裝",
     summary: "第三方 SEO 稽核 plugin（<a href=\"https://github.com/AgriciDaniel/claude-seo\" style=\"color:var(--accent)\">AgriciDaniel/claude-seo</a>，MIT、13.5k stars）：21 個 skill + 18 個 subagent 平行跑全站稽核，涵蓋技術 SEO、E-E-A-T 內容品質、schema、sitemap、Core Web Vitals、圖片、GEO/AEO、在地 SEO，產出有優先順序的行動清單與 PDF／Excel 報告。",
     usage: "<b>怎麼用：</b>裝了之後打 <code>/seo audit 網址</code>。<b>不用任何 API key</b> 就能跑的：audit、page、technical、content、schema、sitemap generate、images、cluster、plan。接免費的 Google API（PageSpeed／Search Console／GA4）可解鎖真實使用者數據，付費的 Ahrefs、DataForSEO 全是選配。",
@@ -375,6 +379,10 @@ const TOOLS = [
   { tab: 3, name: "Heptabase CLI", type: "本地 CLI",
     summary: "Heptabase 的命令列工具（<code>/opt/homebrew/bin/heptabase</code>）：放卡上白板、加標籤、建卡、搜尋，補足 MCP 沒有的寫入功能。",
     usage: "<b>怎麼用：</b>要先開 Heptabase 桌面版並啟用 CLI。說「存到 Heptabase」預設就是走 CLI 建卡放到 Raw Files 白板。" },
+  { tab: 3, name: "Transcriber", type: "自建 CLI",
+    summary: "自己做的錄音轉逐字稿工具（<code>~/ClaudeCode/2_Transcriber/bin/transcribe</code>）：Whisper（本機 GPU）或 Gemini（雲端）轉錄 → 簡轉繁 → pyannote 聲紋分講者 → LLM 校對 → 產出可播放、點句跳秒的 HTML。",
+    usage: "<b>怎麼用：</b>在 Claude Code 打 <code>/transcriber 音檔路徑</code> 最省事；也可以自己跑 <code>./bin/transcribe run 檔案 --speakers 3</code>，跑完再用 <code>speakers</code>／<code>name</code> 子命令命名講者。",
+    note: "設計原則是「忠實優先於好讀」：校對前後兩份文字都留著，HTML 用顏色標出被改過的地方，補字用 <code>[ ]</code>、聽不清用 <code>⟨?⟩</code>。HTML 要直接用瀏覽器開，走簡易 HTTP 伺服器音檔會不能拖曳跳轉。" },
   { tab: 3, name: "trash", type: "安全工具",
     summary: "把「刪除」改成「丟垃圾桶」的小工具，終端機的 <code>rm</code> 已經全域改指向它。",
     usage: "<b>怎麼用：</b>平常照打 <code>rm</code> 就是可還原的刪除；真要永久刪除才用 <code>rm!</code>。" },
@@ -436,7 +444,9 @@ const TOOLS = [
       ["--bg / --background", "以背景代理身分啟動、立刻放你回終端機"],
       ["-w / --worktree", "在隔離的 git worktree 裡啟動"],
       ["--tmux", "幫 worktree 開 tmux session（要搭配 --worktree，有 iTerm2 就用原生分割窗）"],
-    ], note: "啟動旗標 <code>--teleport</code> 已不在 CLI 說明裡（v2.1.222 掃描結果），要把網頁 session 拉回終端機請用對話框的 <code>/teleport</code>。" },
+      ["--teleport [session]", "接回一個網頁 session（可指定 session ID），對話框裡的 /teleport 也做同一件事"],
+      ["--cloud [描述|ID|網址]", "直接開一個雲端 session，或用 session ID／claude.ai/code 網址接回既有的"],
+    ], note: "<code>--teleport</code> 在 v2.1.235 的 CLI 說明裡又回來了（先前 v2.1.222 掃描時消失過）。" },
   { tab: 5, name: "claude 子命令", type: "子命令",
     summary: "接在 claude 後面的動作字（不是旗標），用來做維護或設定，不會進入對話。",
     commands: [
@@ -450,6 +460,8 @@ const TOOLS = [
       ["claude setup-token", "產長效認證 token（訂閱制帳號用，給無人看管的排程認證）"],
       ["claude ultrareview [target]", "非互動跑 ultrareview（多代理雲端審查，即 /code-review ultra）"],
       ["claude project purge [路徑]", "清掉某專案在本機殘留的所有 Claude Code 狀態"],
+      ["claude import [來源]", "把其他 AI 編碼工具的設定匯進 Claude Code"],
+      ["claude auto-mode", "查看或重設自動權限模式的分類器設定（你的 defaultMode 就是 auto）"],
     ], note: "背景 session 的接回／停止／重啟已收進 <code>claude agents</code> 檢視，原本的 <code>claude attach</code> 等獨立子命令與 <code>claude remote-control</code> 都不在了。" },
   { tab: 5, name: "進階・跑腳本用", type: "啟動旗標",
     summary: "自動化、批次或除錯情境才會用到，日常對話用不到。",
@@ -459,6 +471,7 @@ const TOOLS = [
       ["--verbose", "開詳細 log"],
       ["--safe-mode", "停用所有自訂功能啟動，排查問題用"],
       ["--bare", "最精簡模式啟動：跳過 hooks、skills、plugins、MCP 自動載入"],
+      ["--autocompact <auto|大小>", "設自動壓縮的上下文窗口大小（auto 或 100k–1M token）"],
       ["--allowedTools / --disallowedTools", "設定哪些工具不必詢問就能用、哪些一律禁用"],
       ["--dangerously-skip-permissions", "跳過所有權限提示——很危險，一般別用"],
     ], note: "最後一個會讓 Claude 不再問你就直接動手，只在你完全清楚後果時才用。" },
@@ -476,6 +489,10 @@ const TOOLS = [
   { tab: 6, name: "/weather", type: "自建・全域",
     summary: "查桃園區當日天氣，算出各狀態佔比後給一行可貼進日記的格式。",
     usage: "<b>怎麼用：</b>打 <code>/weather</code>，也可帶地名或日期如 <code>/weather 台中北屯區</code>。每晚 22:00 另有 launchd 自動跑一次。" },
+
+  { tab: 6, name: "/transcriber", type: "自建・全域",
+    summary: "把錄音檔轉成繁體中文逐字稿，跑的是 <code>2_Transcriber</code> 那套工具。",
+    usage: "<b>怎麼用：</b>打 <code>/transcriber 音檔或資料夾路徑</code>。它會先問清楚引擎、講者人數、專有名詞表再動手，不用預設值蒙混，跑完會帶你命名講者。" },
 
   // ── Slash 指令：內建（自動載入的 skill 也可直接叫）──
   { tab: 6, name: "Skill 直接呼叫", type: "內建概念",
@@ -595,6 +612,9 @@ const TOOLS = [
   { tab: 7, name: "TDX 即時性快照", type: "launchd 排程",
     summary: "launchd 排程（com.cloudsu.tdxsnapshot）每天凌晨 2:30 打一輪國道路況、YouBike、台鐵、停車場、高鐵等 TDX 指標，用來驗證這些欄位是真的即時更新、不是靜態快照。",
     usage: "<b>怎麼用：</b>全自動，輸出存在 <code>~/Downloads/0_TMP/tdx_snap/</code>。" },
+  { tab: 7, name: "額度重置自動續跑", type: "launchd 排程",
+    summary: "launchd 排程（com.cloud.autocontinue）每 5 分鐘跑一次 <code>tick.sh</code>，看監控名單上的 session 有沒有等到 5 小時窗口重置；時間到就開一個 headless claude 用 SendMessage 把它們全部叫醒接著跑。",
+    usage: "<b>怎麼用：</b>名單空的時候秒退、不叫 Claude，所以平常沒成本。要加人進名單用 watch skill。紀錄看 <code>~/.claude/autocontinue/tick.log</code>，歷史用量看同資料夾的 <code>usage.csv</code>。" },
   { tab: 7, name: "transport-lookup 子代理", type: "自訂子代理",
     summary: "查交通與地點資料的專用子代理，涵蓋 Google Maps（店家景點、路線、天氣空品）與 TDX（公車、台鐵高鐵、停車、路況、YouBike），實際打 API 拿真實資料再整理成精簡結論，不丟原始 JSON。",
     usage: "<b>怎麼用：</b>已預先授權自動委派，不用先問。條件不全會直接用預設值查（沒講路線用固定公車、沒講日期當今天），不會反問你。" },
