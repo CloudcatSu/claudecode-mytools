@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">Cloud 的環境裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/08/19</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
+      <p class="meta">最後更新 <b>2026/09/03</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週三 23:00 也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -325,6 +325,11 @@ const TOOLS = [
     summary: "第三方 SEO 稽核 plugin（<a href=\"https://github.com/AgriciDaniel/claude-seo\" style=\"color:var(--accent)\">AgriciDaniel/claude-seo</a>，MIT、13.5k stars）：21 個 skill + 18 個 subagent 平行跑全站稽核，涵蓋技術 SEO、E-E-A-T 內容品質、schema、sitemap、Core Web Vitals、圖片、GEO/AEO、在地 SEO，產出有優先順序的行動清單與 PDF／Excel 報告。",
     usage: "<b>怎麼用：</b>裝了之後打 <code>/seo audit 網址</code>。<b>不用任何 API key</b> 就能跑的：audit、page、technical、content、schema、sitemap generate、images、cluster、plan。接免費的 Google API（PageSpeed／Search Console／GA4）可解鎖真實使用者數據，付費的 Ahrefs、DataForSEO 全是選配。",
     note: "<b>刻意保留的待辦條目，非環境掃描結果，每週重掃時請勿移除。</b><br>2026/08/07 研究過、決定先不裝，等火水造物案子重啟時再評估，屆時先看更新到哪一版（研究當下為 v2.2.4）。<br><b>裝之前要留意三件事：</b>① 建議走 <code>/plugin marketplace add AgriciDaniel/claude-seo</code>，別跑 install.sh——後者會把 21 個 skill 和 18 個 agent 直接倒進 <code>~/.claude/skills/</code> 與 <code>~/.claude/agents/</code>，難移除也拉長每個 session 的 skill 清單。② 它帶一個全域 <code>PostToolUse</code> hook，任何 Edit／Write 都會觸發 schema 驗證，等於在所有專案都多跑一段。③ 安裝會建獨立 Python 環境並下載 Playwright Chromium，體積不小。" },
+
+  { tab: 1, name: "diagram-design", type: "待試・未安裝",
+    summary: "第三方圖表 plugin（<a href=\"https://github.com/cathrynlavery/diagram-design\" style=\"color:var(--accent)\">cathrynlavery/diagram-design</a>，MIT、29.5k stars、v2.5.10）：38～39 種「編輯級品質」圖表類型，產出自帶樣式的 HTML + SVG。涵蓋架構圖、流程圖、序列圖、狀態機、ER、時間軸、泳道、甘特、Sankey、魚骨、Wardley Map、看板、使用者旅程、樹狀／組織圖、長條／折線／散布／Treemap 等。標語是「No shadows. No Mermaid slop.」——不打陰影、單一重點色、三種字級、4px 網格對齊。",
+    usage: "<b>怎麼用：</b><code>/plugin marketplace add cathrynlavery/diagram-design</code> 再 <code>/plugin install diagram-design@diagram-design</code>。指令有 <code>/diagram-design:profile</code>（設定品牌樣式）、<code>:import-drawio</code>（把 draw.io／Mermaid 舊圖重繪成這套風格）、<code>:export-diagram</code>（輸出 SVG／PNG／HTML）。品牌抽取會從指定網站首頁抓主色與字體、對應成語意角色（紙、墨、靜音、重點、連結）並驗 WCAG AA 對比，確認後寫進 <code>style-guide.md</code>；設定檔可放 <code>~/.diagram-design/profiles/</code> 跨專案共用。",
+    note: "<b>刻意保留的待辦條目，非環境掃描結果，每週重掃時請勿移除。</b><br>2026/09/03 記錄，先不裝。<br><b>優點：</b>沒有全域 hook、離線可用、不吃 API key，跟現有工具不衝突（koboyo-icons 是找圖示、Figma 的 generate_diagram 走 FigJam，這個是產靜態 HTML/SVG 圖表）。裝的成本低、隨時可移除。<br><b>要留意：</b>① PNG 輸出需要另外 <code>pip install playwright && playwright install chromium</code>，只要 SVG／HTML 就不用。② 首次使用會要求先跑品牌上線流程（<code>profile</code>），沒設定會被擋著不畫——火水造物的配色可以在這時一次設好。③ 字體可能連 Google Fonts（HTTPS）。"},
 
   // ── MCP・連接器 ──
   { tab: 2, name: "Firecrawl", type: "自裝 MCP",
