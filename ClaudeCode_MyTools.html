@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">這台機器裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/09/20</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週也會自動重掃更新</p>
+      <p class="meta">最後更新 <b>2026/09/30</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -423,6 +423,10 @@ const TOOLS = [
     summary: "自己做的錄音轉逐字稿工具（<code>~/ClaudeCode/2_Transcriber/bin/transcribe</code>）：Whisper（本機 GPU）或 Gemini（雲端）轉錄 → 簡轉繁 → pyannote 聲紋分講者 → LLM 校對 → 產出可播放、點句跳秒的 HTML。",
     usage: "<b>怎麼用：</b>在 Claude Code 打 <code>/transcriber 音檔路徑</code> 最省事；也可以自己跑 <code>./bin/transcribe run 檔案 --speakers 3</code>，跑完再用 <code>speakers</code>／<code>name</code> 子命令命名講者。",
     note: "設計原則是「忠實優先於好讀」：校對前後兩份文字都留著，HTML 用顏色標出被改過的地方，補字用 <code>[ ]</code>、聽不清用 <code>⟨?⟩</code>。HTML 要直接用瀏覽器開，走簡易 HTTP 伺服器音檔會不能拖曳跳轉。" },
+  { tab: 3, name: "img2md（OCR 工具鏈）", type: "自建 CLI",
+    summary: "自己做的一組小工具（<code>~/ClaudeCode/tools/</code>，已加進 PATH）：把一疊「有階層結構的長截圖」（大綱筆記、簡報、心智圖）變成可編輯、可搜尋的 Markdown，縮排階層會保留。流程是切片 → Apple Vision OCR → 重建階層 → 簡轉繁。",
+    usage: "<b>怎麼用：</b>一條龍打 <code>img2md.sh 圖片資料夾</code>。也可以單獨用零件：<code>vision-ocr</code>（Apple Vision OCR，輸出帶座標的 JSON）、<code>slice_images.py</code>（長圖切橫條）、<code>ocr2md.py</code>（OCR JSON → 階層 Markdown）、<code>s2t.sh</code>（opencc 簡→繁）。",
+    note: "兩個關鍵設計：① Apple Vision 會把過長的圖縮到處理上限，文字被壓扁就認不出來——實測 4112×16336 的長截圖只認出 3 段文字，切成 2000px 高的橫條後正常辨識出 1500+ 行。② 階層是從每行左緣的 x 座標反推：用「x 座標直方圖抓密集峰 → 每行吸附到最近的峰」，不用依序分群，避免 OCR 座標抖動把同一層拆成好幾層。<br>OCR 引擎來自 <a href=\"https://github.com/bytefer/macos-vision-ocr\" style=\"color:var(--accent)\">bytefer/macos-vision-ocr</a>（MIT，要自己用 Swift 編譯）；另外依賴 opencc 與 Pillow。" },
   { tab: 3, name: "trash", type: "安全工具",
     summary: "把「刪除」改成「丟垃圾桶」的小工具，終端機的 <code>rm</code> 已經全域改指向它。",
     usage: "<b>怎麼用：</b>平常照打 <code>rm</code> 就是可還原的刪除；真要永久刪除才用 <code>rm!</code>。" },
@@ -486,6 +490,7 @@ const TOOLS = [
       ["--tmux", "幫 worktree 開 tmux session（要搭配 --worktree，有 iTerm2 就用原生分割窗）"],
       ["--teleport [session]", "接回一個網頁 session（可指定 session ID），對話框裡的 /teleport 也做同一件事"],
       ["--cloud [描述|ID|網址]", "直接開一個雲端 session，或用 session ID／claude.ai/code 網址接回既有的"],
+      ["--desktop", "改在 Claude 桌面 App 開啟而不是終端機（搭配 -c 或 -r 可接回指定 session）"],
     ], note: "<code>--teleport</code> 在 v2.1.235 的 CLI 說明裡又回來了（先前 v2.1.222 掃描時消失過）。" },
   { tab: 5, name: "claude 子命令", type: "子命令",
     summary: "接在 claude 後面的動作字（不是旗標），用來做維護或設定，不會進入對話。",
@@ -496,13 +501,18 @@ const TOOLS = [
       ["claude mcp", "設定 MCP 伺服器"],
       ["claude plugin", "管理外掛"],
       ["claude agents", "打開代理檢視，監控與分派背景 session（加 --json 可列成清單給腳本用）"],
+      ["claude attach <id>", "在這個終端機打開某個背景 session（id 是 --bg 印出、claude agents 列出的短 id）"],
+      ["claude logs <id>", "印出背景 session 最近的終端機輸出，不用接進去就能看進度"],
+      ["claude stop <id>", "停掉背景 session，對話會保留（也可寫成 claude kill）"],
+      ["claude respawn [id]", "重啟背景 session 讓它跑目前的新版本（--all 一次全部）"],
+      ["claude rm <id>", "刪掉背景 session，安全時連同它的 worktree 一起清"],
       ["claude install [版本]", "安裝原生版本（stable／latest／指定版號）"],
       ["claude setup-token", "產長效認證 token（訂閱制帳號用，給無人看管的排程認證）"],
       ["claude ultrareview [target]", "非互動跑 ultrareview（多代理雲端審查，即 /code-review ultra）"],
       ["claude project purge [路徑]", "清掉某專案在本機殘留的所有 Claude Code 狀態"],
       ["claude import [來源]", "把其他 AI 編碼工具的設定匯進 Claude Code"],
       ["claude auto-mode", "查看或重設自動權限模式的分類器設定（你的 defaultMode 就是 auto）"],
-    ], note: "背景 session 的接回／停止／重啟已收進 <code>claude agents</code> 檢視，原本的 <code>claude attach</code> 等獨立子命令與 <code>claude remote-control</code> 都不在了。" },
+    ], note: "背景 session 的接回／停止／重啟在 v2.1.285 又有獨立子命令了（attach、logs、stop、respawn、rm），也可以繼續在 <code>claude agents</code> 檢視裡操作；<code>claude remote-control</code> 子命令仍然沒有，改用 <code>--remote-control</code> 旗標。" },
   { tab: 5, name: "進階・跑腳本用", type: "啟動旗標",
     summary: "自動化、批次或除錯情境才會用到，日常對話用不到。",
     commands: [
@@ -635,6 +645,10 @@ const TOOLS = [
     summary: "全域 PreToolUse hook（rclone_guard.py）：擋掉 <code>rclone sync</code>。sync 會把雲端目的地「多出來的檔案」刪掉，一個路徑打錯就可能清掉整批資料。",
     usage: "<b>怎麼用：</b>不用做什麼，只在執行 rclone 指令時觸發。上傳一律用 <code>rclone copy</code> 或 gdrive-share skill；真的要 sync 就自己在終端機打。",
     note: "2026/09/19 建立。出錯時採放行（fail-open）：它是保險絲，不是唯一防線，skill 裡的規則仍然有效。" },
+  { tab: 7, name: "App 備份唯讀守門 hook", type: "安全防護",
+    summary: "全域 PreToolUse hook（moze_guard.py）：某個 App 的 iCloud 備份資料夾只准讀、不准寫。Write／Edit 路徑落在裡面直接擋；Bash 指令提到那個資料夾又帶有 rm、mv、重導向、cd 進去等寫入動作也擋。",
+    usage: "<b>怎麼用：</b>不用做什麼。要處理裡面的資料就先 <code>cp</code> 一份到別處再讀；被誤擋時把指令拆開，先複製出來，後續動作另起一行、不提那個路徑。",
+    note: "2026/09/27 建立。刻意「寧可誤擋」：那個 App 的資料庫格式一打開就會就地升級，所以連在原地開檔都不行。出錯時一樣採放行（fail-open），跟其他守門 hook 一致。<br>（公開頁面刻意不寫是哪個 App、資料內容是什麼，請使用者確認這樣的寫法可以。）" },
   { tab: 7, name: "自動化健檢", type: "SessionStart hook",
     summary: "每次開 Claude Code（啟動、接續、/clear）都跑一次 <code>health_check.sh</code>，檢查各個排程與工具是不是還活著——例如天氣紀錄有沒有按時寫進去、週報有沒有產出。沒事完全安靜，有異常就直接印在對話最前面。",
     usage: "<b>怎麼用：</b>全自動。清冊在 <code>0_ConfigAndReports/AutomationHealth/排程清冊.md</code>，那份是「有哪些東西在自己跑、怎麼算成功」的唯一真相來源，改清冊要同步改腳本。手動跑 <code>health_check.sh --full</code> 可以連同外部服務的連線一起驗。",
