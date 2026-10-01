@@ -7,7 +7,7 @@
 - 每個這類條目的 `note` 開頭也會有防護句（「刻意保留的待辦條目…」），但那是給人看的雙重保險，不是唯一防線；這條規則本身才是真正的判斷依據。
 - 新增待辦條目時，`note` 開頭請照既有格式加上同一句防護句，維持一致。
 
-目前待辦條目：book-to-skill（把書轉成 agent skill）、claude-seo（SEO 稽核 plugin）、Open Slide（投影片即程式碼框架）、phone-harness（讓 agent 操控真實 iPhone）、OfficeCLI（Office 文件自動化 CLI）。
+目前待辦條目：book-to-skill（把書轉成 agent skill）、claude-seo（SEO 稽核 plugin）、Open Slide（投影片即程式碼框架）、agency-agents（AI 專家角色庫）、phone-harness（讓 agent 操控真實 iPhone）、OfficeCLI（Office 文件自動化 CLI）。
 
 ## 這是公開網頁：只寫工具，不寫個人資訊
 `ClaudeCode_MyTools.html` 會 push 到公開的 GitHub repo 並用 GitHub Pages 上線，**要當成陌生人會看到的東西來寫**。重掃時新增或改寫任何條目，都套用以下界線：
