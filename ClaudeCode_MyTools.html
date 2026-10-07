@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">這台機器裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/09/30</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週也會自動重掃更新</p>
+      <p class="meta">最後更新 <b>2026/10/07</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -310,9 +310,9 @@ const TOOLS = [
     summary: "介面設計全能包：設計、改版、審查、打磨 UI，涵蓋排版、配色、動態、無障礙、文案。",
     usage: "<b>怎麼用：</b>任何「把介面弄好看、弄好用」的需求都可以指名它，包括嫌設計太平淡或太吵。" },
   { tab: 0, name: "帳號同步 skill 包", type: "自動同步",
-    summary: "從 claude.ai 帳號同步下來的 skill，放在 <code>~/.claude/skills/synced/</code>，共 12 個：algorithmic-art、brand-guidelines、canvas-design、docs、docx、import-memory、morning、pdf、pptx、skill-creator、theme-factory、xlsx。",
+    summary: "從 claude.ai 帳號同步下來的 skill，放在 <code>~/.claude/skills/synced/</code>，共 17 個：algorithmic-art、brand-guidelines、built-in-browser、canvas-design、chrome-browser、computer-use、deep-research、docs、docx、google-workspace、import-memory、morning、pdf、pptx、skill-creator、theme-factory、xlsx。",
     usage: "<b>怎麼用：</b>跟其他 skill 一樣自動觸發，也可以打 <code>/名稱</code> 指名。不用手動維護，跟著帳號更新。",
-    note: "2026/09 出現。其中 7 個已在 <code>settings.json</code> 的 <code>skillOverrides</code> 關掉（algorithmic-art、brand-guidelines、docs、import-memory、morning、pdf、theme-factory），實際會載入的只剩 canvas-design、docx、pptx、skill-creator、xlsx 這 5 個，讓 skill 清單精簡一點。下面那幾個「文件 skill」（docx／pdf／pptx／xlsx）就是從這裡來的，不是「外掛包」分頁那個 example-skills——那包是另外 12 個，兩邊不重疊。同名的 skill 若兩邊都有，以載入時實際出現的為準。" },
+    note: "2026/09 出現。其中 7 個已在 <code>settings.json</code> 的 <code>skillOverrides</code> 關掉（algorithmic-art、brand-guidelines、docs、import-memory、morning、pdf、theme-factory），實際會載入的是 built-in-browser、canvas-design、chrome-browser、computer-use、deep-research、docx、google-workspace、pptx、skill-creator、xlsx 這 10 個，讓 skill 清單精簡一點。2026/10 新增的 5 個（built-in-browser、chrome-browser、computer-use 是操作瀏覽器與桌面前要先讀的使用守則；deep-research 是多來源研究報告；google-workspace 是改寫 Google 文件／試算表／簡報的輔助）都沒關。下面那幾個「文件 skill」（docx／pdf／pptx／xlsx）就是從這裡來的，不是「外掛包」分頁那個 example-skills——那包是另外 12 個，兩邊不重疊。同名的 skill 若兩邊都有，以載入時實際出現的為準。" },
   { tab: 0, name: "docx（Word）", type: "文件 skill",
     summary: "建立、讀取、編輯 Word 文件：目錄、頁碼、信頭、追蹤修訂都能處理。",
     usage: "<b>怎麼用：</b>提到 .docx 或要產出正式報告、信件時自動啟用。" },
@@ -514,7 +514,7 @@ const TOOLS = [
       ["claude install [版本]", "安裝原生版本（stable／latest／指定版號）"],
       ["claude setup-token", "產長效認證 token（訂閱制帳號用，給無人看管的排程認證）"],
       ["claude ultrareview [target]", "非互動跑 ultrareview（多代理雲端審查，即 /code-review ultra）"],
-      ["claude project purge [路徑]", "清掉某專案在本機殘留的所有 Claude Code 狀態"],
+      ["claude purge [路徑]", "清掉某專案在本機殘留的所有 Claude Code 狀態（--all 一次清全部專案；舊寫法 claude project purge 已改名）"],
       ["claude import [來源]", "把其他 AI 編碼工具的設定匯進 Claude Code"],
       ["claude auto-mode", "查看或重設自動權限模式的分類器設定（你的 defaultMode 就是 auto）"],
     ], note: "背景 session 的接回／停止／重啟在 v2.1.285 又有獨立子命令了（attach、logs、stop、respawn、rm），也可以繼續在 <code>claude agents</code> 檢視裡操作；<code>claude remote-control</code> 子命令仍然沒有，改用 <code>--remote-control</code> 旗標。" },
@@ -601,6 +601,7 @@ const TOOLS = [
       ["/claude-api", "Claude API／Anthropic SDK 速查：model id、價格、串流、tool use、快取、模型遷移"],
       ["/autofix-pr", "開一個網頁 session 盯著 PR，CI 失敗或有審查意見時自動推修復"],
       ["/design-sync", "把 repo 的 React 設計系統轉換、上傳到 Claude Design（需先 /design-login 授權一次）"],
+      ["/plugin-authoring", "載入寫 mod 的參考手冊：在 Claude Code 裡做即時面板、狀態列、通知或 hook，存檔就熱重載（v2.1.287 起內建，可在 /plugin 關掉）"],
     ] },
   { tab: 6, name: "內建・設定與權限", type: "內建指令",
     summary: "調整偏好、權限、hooks、記憶、子代理、MCP。",
