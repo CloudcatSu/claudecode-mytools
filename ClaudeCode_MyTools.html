@@ -332,6 +332,11 @@ const TOOLS = [
     usage: "<b>怎麼用：</b>裝了之後打 <code>/book-to-skill ./某本書.pdf</code>（也吃資料夾或 glob），轉完就多一個 <code>/書名-slug</code> 指令，問它 <code>/書名-slug 某主題</code> 會去讀對應章節再回答。另有 analyze-only、從分析結果生成、以及把新資料折進既有 skill 的更新模式。",
     note: "<b>刻意保留的待辦條目，非環境掃描結果，每週重掃時請勿移除。</b><br>2026/09/20 看到，還沒裝。<br><b>裝之前要留意：</b>① 安裝走 <code>npx skills add virgiliojr94/book-to-skill</code>（跨 agent 標準，裝在 <code>~/.agents/skills/</code>，Claude Code 會另外做 symlink），或直接 <code>git clone</code> 到 <code>~/.claude/skills/book-to-skill</code>。② 抽取器本機已有 <code>pdftotext</code> 和 <code>pypdf</code>（純文字書夠用）；技術書（有程式碼、表格、公式）它會建議 <code>docling</code>，<b>目前沒裝</b>，約 1.5 秒／頁。③ 掃描檔沒有文字層會直接中止，要先 OCR——可以先走自己那套 <code>~/ClaudeCode/tools/</code> 的 vision-ocr 工具鏈。④ <b>抽取在本機，但蒸餾是 agent 做的</b>，書的內文會進 Claude 的 context，版權書或敏感資料要自己拿捏；作者也明講產出的 skill 別公開轉發。<br><b>可能的用法：</b>工業設計、品牌、簡報方法論這類會反覆翻的書，以及自己的品牌／語氣文件，折成一個隨時問得到的 skill。"},
 
+  { tab: 0, name: "thinkwithblack-skill", type: "待試・未安裝",
+    summary: "台灣行銷顧問邱煜庭（小黑老師）整理的 365 份免費「行銷方法包」（<a href=\"https://github.com/backtrue/thinkwithblack-skill\" style=\"color:var(--accent)\">backtrue/thinkwithblack-skill</a>，MIT）。每份是一個 Markdown 檔，帶著需要的資料、處理步驟、交付格式與核對方式，涵蓋商品賣點整理、單品貢獻毛利計算、檔期預算與獲利預估、第一次回購促進、電子報主旨、會員規則簡化等。用法是先上傳 <code>INDEX.md</code> 讓 AI 從索引挑方法，再上傳對應的 <code>packs/*.md</code> 開始做。附虛構練習資料與可自填的品牌背景表。",
+    usage: "<b>怎麼用：</b>下載教材包解壓縮，在 Claude／ChatGPT／Gemini 對話上傳 <code>INDEX.md</code>，貼上 README 的起手指示加上自己的問題，AI 會告訴你要再上傳哪一份 <code>packs/</code> 檔。<b>它不是標準的 Claude Code skill 格式</b>，沒有 SKILL.md 與 frontmatter。",
+    note: "<b>刻意保留的待辦條目，非環境掃描結果，每週重掃時請勿移除。</b><br>2026/10/12 看到，還沒裝。<br><b>裝之前要留意：</b>① 要在 Claude Code 用，比較順的做法是把 <code>packs/</code> 放到某個資料夾，需要時叫 Claude 讀 <code>INDEX.md</code> 再挑檔；或挑常用的幾份用 skill-creator 轉成真正的 skill。不要 365 份全塞進 <code>~/.claude/skills/</code>。② 內容是外部整理的方法論，抽幾份看過再信，不無條件照做。③ README 提到進階的資料串接與自動化走付費的 ThinkWithBlack MCP，免費版只有方法包本身。<br><b>可能的用法：</b>火水造物的商品定價與毛利試算、檔期預算、回購與電子報文案時，當有步驟、可核對的方法底稿。"},
+
   // ── 外掛包 ──
   { tab: 1, name: "example-skills（Anthropic 官方包）", type: "plugin",
     summary: "官方 skill 合集，共 12 個：skill-creator（做新 skill）、mcp-builder、frontend-design、algorithmic-art、canvas-design、doc-coauthoring、internal-comms、slack-gif-creator、theme-factory、web-artifacts-builder、webapp-testing、brand-guidelines。",
@@ -443,6 +448,10 @@ const TOOLS = [
     summary: "第三方 CLI 工具（<a href=\"https://github.com/iOfficeAI/OfficeCLI\" style=\"color:var(--accent)\">iOfficeAI/OfficeCLI</a>，Apache 2.0）：單一執行檔，不用裝 Office 或 LibreOffice，可讀寫建立 .docx/.xlsx/.pptx，內建渲染引擎把文件轉 HTML/PNG 讓 AI 看排版結果，並附 MCP server。",
     usage: "<b>怎麼用：</b>強項在「工程師規模化批次產文件」：套模板量產（merge）、Excel 公式引擎（350+ 函數自動計算）、pivot table、追蹤修訂、RTL 多語言排版、CI/CD 自動化產文件。",
     note: "<b>刻意保留的待辦條目，非環境掃描結果，每週重掃時請勿移除。</b><br>2026/08/14 記錄，先不裝——這些強項跟 Cloud 目前簡報／文件／報表的使用型態對不上，現有的 docx/pptx/xlsx skill（python-docx／openpyxl／python-pptx 底層）已經夠用，也已經跟 pptx-builder 這類既有流程綁定。<br><b>什麼時候該重新評估：</b>未來如果出現「同一份範本要批次套幾十份客戶資料」或「Excel 要跑大量公式且要求精準計算」這類量產型需求，再裝。裝的成本很低（單一 binary + 一分鐘設定），隨時可以加回來。" },
+  { tab: 3, name: "REA", type: "待試・未安裝",
+    summary: "逆向工程用的 MCP＋CLI（<a href=\"https://github.com/morluto/rea\" style=\"color:var(--accent)\">morluto/rea</a>，MIT、約 10 萬 stars、npm 套件 <code>rea-agents</code>、更新很勤）。讓 AI agent 在本機檢查「沒有原始碼的東西」並回報證據與限制：原生執行檔（偽碼、組合語言、字串、呼叫關係，需 Hopper／Ghidra／IDA 之一）、JavaScript／Electron app（模組、IPC、source map）、網站（頁面結構、網路請求）、.NET 組件、Android APK、韌體、WASM、HAR 網路紀錄等。分析在本機跑，結果交給 agent 解釋或照著重做一個功能。",
+    usage: "<b>怎麼用：</b><code>npx rea-agents setup</code> 會把 MCP server 與對應的工作流程指示註冊進 Claude Code 等 agent（會先列出變更、備份舊設定），重啟後直接問，例如「研究某 app 的搜尋怎麼運作、給我證據、幫我做類似功能」。也能單獨用終端機：<code>npx -y rea-agents@latest analyze-javascript-application /路徑 --json</code>；常用就 <code>npm install --global rea-agents</code>，更新用 <code>rea update</code>。需要 Node.js 22.19 以上。",
+    note: "<b>刻意保留的待辦條目，非環境掃描結果，每週重掃時請勿移除。</b><br>2026/10/12 看到，還沒裝。<br><b>裝之前要留意：</b>① 只用在自己的東西或有授權的目標，作者在 README 也聲明使用者自負合法性。② 靜態分析 JavaScript／.NET 不用額外引擎；原生執行檔要先有 Hopper／Ghidra／IDA。③ 「執行期擷取」會用你的使用者權限去跑目標程式，先看該指南的影響範圍。④ 版本迭代快（單日數十個 commit），裝完定期 <code>rea update</code>。⑤ 它的 MCP 工具很多，註冊後會增加 session 的工具清單，用不到時可以先不註冊。<br><b>可能的用法：</b>拆解公開網站或 Electron app 的前端做法當設計與實作參考；研究自己做的工具包。"},
 
   // ── 終端機捷徑 ──
   { tab: 4, name: "cc", type: "終端機指令",
