@@ -225,7 +225,7 @@
         <h1>Claude Code 工具總覽</h1>
         <p class="subtitle">這台機器裡所有裝好、接好、設定好的東西，一頁備忘。</p>
       </div>
-      <p class="meta">最後更新 <b>2026/10/07</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週也會自動重掃更新</p>
+      <p class="meta">最後更新 <b>2026/10/21</b><br>要更新時跟 Claude 說「幫我更新工具總覽網頁」，每週也會自動重掃更新</p>
     </div>
     <div class="searchbar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -402,6 +402,9 @@ const TOOLS = [
   { tab: 2, name: "Google Drive", type: "內建連接器",
     summary: "搜尋、讀取、建立雲端硬碟裡的檔案與文件。",
     usage: "<b>怎麼用：</b>資料放在 Drive 時直接說檔名或內容關鍵字。" },
+  { tab: 2, name: "Google 文件／試算表／簡報", type: "內建連接器",
+    summary: "Google Docs、Sheets、Slides 三個連接器：讀內容、直接改寫 Google 文件、讀寫試算表儲存格與公式、改簡報頁面與截縮圖。",
+    usage: "<b>怎麼用：</b>貼 docs.google.com 連結或說要改某份 Google 文件／試算表／簡報。要動手改之前會先載入帳號同步包裡的 google-workspace skill；只是要做一份新文件、沒指定 Google 的話不會用它。" },
   { tab: 2, name: "Notion", type: "內建連接器",
     summary: "讀取、建立、更新 Notion 頁面和資料庫，適合結構化、要跟別人共用的資料。",
     usage: "<b>怎麼用：</b>說「存到 Notion」「查 Notion 某頁」。跟 Heptabase 的分工：Notion 放共用與資料庫化的內容。" },
